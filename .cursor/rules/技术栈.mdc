@@ -1,0 +1,35 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 技术架构
+1.**前端技术栈**
+   - React.js/Next.js - 用户界面框架
+   - TypeScript - 强类型支持
+   - Tailwind CSS - 样式管理
+   - shadcn/ui - UI组件
+   - Redux/Context API - 状态管理
+   - MiniMax MCP - 语音识别和合成
+   - Socket.io-client - 实时通信
+
+2. **后端技术栈**
+   - FastAPI - 服务器框架
+   - SQLite - 数据存储
+   - Socket.io - 实时通信
+
+
+3. **AI服务**
+   - DEEPSEEK API - 面试官AI逻辑
+   - MiniMax MCP（ASR + TTS） - 语音转文字和文字转语音
+   - CrewAI - 多智能体协作框架，用于构建“多角色 AI 面试官”系统
+   - 知识库存储	Chroma（本地） / Pinecone（云）	存储岗位说明、面试题、语义检索
+
+4. **DevOps**
+   - Git/GitHub - 版本控制
+   - CI/CD Pipeline - 自动部署
+   - Docker - 容器化
+   - Vercel - 前端部署
+   - Railway - 后端部署
+
+   ---

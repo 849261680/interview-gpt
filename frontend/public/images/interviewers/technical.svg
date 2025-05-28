@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="128" cy="128" r="128" fill="#E6F2FF"/>
+  
+  <!-- 技术面试官简化头像 -->
+  <circle cx="128" cy="108" r="48" fill="#4B7BEC"/>
+  <rect x="80" y="160" width="96" height="48" rx="24" fill="#4B7BEC"/>
+  
+  <!-- 眼镜 -->
+  <rect x="100" y="102" width="56" height="12" rx="6" stroke="#FFFFFF" stroke-width="4" fill="none"/>
+  <circle cx="108" cy="108" r="10" stroke="#FFFFFF" stroke-width="4" fill="none"/>
+  <circle cx="148" cy="108" r="10" stroke="#FFFFFF" stroke-width="4" fill="none"/>
+  
+  <!-- 代码符号 -->
+  <text x="128" y="220" font-family="monospace" font-size="24" text-anchor="middle" fill="#333333">&lt;/&gt;</text>
+</svg>

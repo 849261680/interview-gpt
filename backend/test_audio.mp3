@@ -1,0 +1,7 @@
+
+            <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="zh-CN">
+                <prosody rate="1.0" pitch="1.0" volume="1.0">
+                    你好，欢迎参加面试！
+                </prosody>
+            </speak>
+            

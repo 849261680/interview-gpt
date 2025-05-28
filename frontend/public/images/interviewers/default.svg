@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="128" cy="128" r="128" fill="#F0F4F8"/>
+  
+  <!-- 默认面试官简化头像 -->
+  <circle cx="128" cy="100" r="48" fill="#718096"/>
+  <rect x="80" y="160" width="96" height="48" rx="24" fill="#718096"/>
+  
+  <!-- 面部特征 -->
+  <circle cx="114" cy="100" r="8" fill="#F0F4F8"/>
+  <circle cx="142" cy="100" r="8" fill="#F0F4F8"/>
+  <path d="M108 120C108 120 118 128 128 128C138 128 148 120 148 120" stroke="#F0F4F8" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- 问答图标 -->
+  <path d="M116 200H140" stroke="#2D3748" stroke-width="4" stroke-linecap="round"/>
+  <path d="M128 188V212" stroke="#2D3748" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="128" cy="210" r="20" stroke="#2D3748" stroke-width="4" fill="none"/>
+</svg>

@@ -1,0 +1,243 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+下后端使用 MiniMax Model Context Protocol（MiniMax MCP）的说明文档，适合后端开发者快速上手集成MiniMax MCP的各种AI功能。
+
+---
+
+# MiniMax MCP 后端使用说明文档
+
+## 1. 简介
+
+MiniMax MCP（Model Context Protocol）是一个标准化AI服务协议，提供文本转语音、图像生成、视频生成、声音克隆等AI能力。通过统一的API协议，简化多种AI模型调用，方便后端系统将MiniMax强大的生成式AI能力集成到业务流程中。
+
+---
+
+## 2. 环境准备
+
+### 2.1 系统要求
+
+- 操作系统：Linux/macOS/Windows均支持
+- Python 版本：3.7及以上
+- 网络环境：能够访问MiniMax API服务器
+
+### 2.2 安装 MiniMax MCP 服务端
+
+推荐使用 Python 包安装：
+
+```bash
+pip install minimax-mcp
+```
+
+或者从官方GitHub 仓库克隆源码自行部署：
+
+```bash
+git clone https://github.com/MiniMax-AI/MiniMax-MCP.git
+cd MiniMax-MCP
+pip install -r requirements.txt
+python setup.py install
+```
+
+---
+
+## 3. 配置说明
+
+### 3.1 获取API Key和Host
+
+MiniMax服务全局有两种不同区域接口：
+
+| 区域       | API Host                   | API Key获取地址          |
+|------------|----------------------------|-------------------------|
+| 全球 (Global)  | `https://api.minimaxi.chat`  (注意多了一个i) | MiniMax 官网全局服务页面 |
+| 中国大陆 (Mainland) | `https://api.minimax.chat`       | 旗下大陆服务渠道          |
+
+> **注意** API Key 要和 API Host 匹配，否则会出现无效Key错误。
+
+### 3.2 设置环境变量
+
+将对应Key和Host配置为环境变量：
+
+```bash
+export MINIMAX_API_KEY="你的API_KEY"
+export MINIMAX_API_HOST="https://api.minimaxi.chat"  # 或 https://api.minimax.chat
+```
+
+Windows PowerShell：
+
+```powershell
+setx MINIMAX_API_KEY "你的API_KEY"
+setx MINIMAX_API_HOST "https://api.minimaxi.chat"
+```
+
+---
+
+## 4. 启动MiniMax MCP服务
+
+成功安装后，在命令行运行以下命令启动：
+
+```bash
+minimax-mcp -y
+```
+
+- `-y` 表示自动确认，后台运行服务。
+
+如果你想通过代码调用MiniMax MCP，也可以直接调用该命令的子进程。
+
+---
+
+## 5. 后端集成示例
+
+这里以 Python 为例，介绍如何通过子进程与 MiniMax MCP server 交互，实现文本转语音（TTS）功能。
+
+### 5.1 使用`subprocess`调用
+
+```python
+import subprocess
+import json
+
+def minimax_tts(text: str, voice: str = "default"):
+    # 启动 MCP 服务子进程
+    proc = subprocess.Popen(
+        ['minimax-mcp', '-y'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1
+    )
+
+    # 构造请求
+    request = {
+        "tool": "text_to_audio",
+        "query": {
+            "text": text,
+            "voice": voice
+        }
+    }
+
+    # 发送请求，换行结束
+    proc.stdin.write(json.dumps(request) + "\n")
+    proc.stdin.flush()
+
+    # 读取回复（通常是含有音频URL或者base64音频数据的json）
+    response_line = proc.stdout.readline()
+    response = json.loads(response_line)
+
+    # 关闭子进程输入输出流
+    proc.stdin.close()
+    proc.stdout.close()
+    proc.stderr.close()
+    proc.wait()
+
+    return response
+
+if __name__ == "__main__":
+    text = "欢迎使用MiniMax MCP文本转语音功能。"
+    result = minimax_tts(text)
+    print("转语音结果：", result)
+```
+
+### 5.2 解析响应
+
+响应数据通常包含生成的音频链接或本地路径，具体字段根据MiniMax官方文档定义：
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "audio_url": "https://cdn.minimax.chat/audio/xxx.mp3",
+    "duration": 3.2
+  }
+}
+```
+
+你可以根据`audio_url`字段播放或下载音频。
+
+---
+
+## 6. 可用工具列表及示例请求
+
+### 6.1 文本转语音
+
+```json
+{
+  "tool": "text_to_audio",
+  "query": {
+    "text": "示例文本",
+    "voice": "default"
+  }
+}
+```
+
+### 6.2 获取声音列表
+
+```json
+{
+  "tool": "list_voices",
+  "query": {}
+}
+```
+
+### 6.3 声音克隆
+
+```json
+{
+  "tool": "voice_clone",
+  "query": {
+    "audio_files": ["file1.wav", "file2.wav"],
+    "clone_name": "CustomVoice"
+  }
+}
+```
+
+### 6.4 生成图片
+
+```json
+{
+  "tool": "text_to_image",
+  "query": {"prompt": "夕阳下的海边"}
+}
+```
+
+### 6.5 生成视频
+
+```json
+{
+  "tool": "generate_video",
+  "query": {"prompt": "飞翔的海鸥"}
+}
+```
+
+---
+
+## 7. 高级使用
+
+- **批量请求**：可以连续写多条JSON请求，每条一行，实现异步批量调用。
+- **传输方式**：协议还支持SSE（服务器推送事件），适合需要实时数据推送的场景。
+- **本地资源管理**：可配置API生成结果存储本地路径，实现缓存和离线使用。
+- **多语言支持**：JavaScript版本`MiniMax-MCP-JS`适合集成到Node.js后端或前端服务。
+
+---
+
+## 8. 常见问题
+
+| 问题描述                  | 解决方案                                        |
+|---------------------------|------------------------------------------------|
+| 报错 `invalid api key`    | 两个参数API key和host不匹配，检查环境变量设置。   |
+| 单条请求超时或无响应      | 检查网络连通性、API key是否有效，查看服务日志。    |
+| 无法启动 `minimax-mcp`    | 确认python包安装成功，系统环境变量配置正确。       |
+
+---
+
+## 9. 参考资源
+
+- MiniMax MCP官方GitHub仓库：https://github.com/MiniMax-AI/MiniMax-MCP  
+- 官方API说明和示例：https://www.claudemcp.com/servers/minimax-mcp  
+- MiniMax官网：https://www.minimax.io/platform  
+
+---
+
+如果你需要在特定后端框架中实现（如Django、FastAPI、Express等）的集成示例，也可以告诉我，我帮你写对应方案。

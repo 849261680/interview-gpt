@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="480" height="120" viewBox="0 0 480 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="480" height="120" rx="16" fill="#F8FAFC"/>
+  
+  <!-- 图标部分 -->
+  <circle cx="60" cy="60" r="40" fill="#4338CA"/>
+  
+  <!-- 对话气泡 - 面试官 -->
+  <path d="M45 45C45 42.2386 47.2386 40 50 40H70C72.7614 40 75 42.2386 75 45V65C75 67.7614 72.7614 70 70 70H50C47.2386 70 45 67.7614 45 65V45Z" fill="white"/>
+  <path d="M50 75L55 65H65L50 75Z" fill="white"/>
+  
+  <!-- 对话气泡 - 用户 -->
+  <path d="M75 50C75 47.2386 77.2386 45 80 45H95C97.7614 45 100 47.2386 100 50V65C100 67.7614 97.7614 70 95 70H80C77.2386 70 75 67.7614 75 65V50Z" fill="#EBF8FF"/>
+  <path d="M70 75L75 65H85L70 75Z" fill="#EBF8FF"/>
+  
+  <!-- 文字部分 - "Interview" -->
+  <path d="M130 36H136V84H130V36ZM162 36H168V84H162V36ZM136 57H162V63H136V57Z" fill="#1A202C"/>
+  
+  <!-- 文字部分 - "GPT" -->
+  <path d="M178 36H214V42H184V57H210V63H184V84H178V36Z" fill="#4338CA"/>
+  <path d="M220 36H256V42H226V57H252V63H226V78H256V84H220V36Z" fill="#4338CA"/>
+  <path d="M262 36H268V78H298V84H262V36Z" fill="#4338CA"/>
+  
+  <!-- 字母上的小点缀 -->
+  <circle cx="133" cy="40" r="3" fill="#4338CA"/>
+  <circle cx="165" cy="40" r="3" fill="#4338CA"/>
+  
+  <!-- 右侧装饰 -->
+  <circle cx="380" cy="60" r="30" fill="#F0F4FF" stroke="#4338CA" stroke-width="2"/>
+  <path d="M365 60L375 70L395 50" stroke="#4338CA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- 小星星装饰 -->
+  <path d="M435 40L440 30L445 40L455 45L445 50L440 60L435 50L425 45L435 40Z" fill="#4338CA"/>
+  <path d="M410 70L413 65L416 70L421 73L416 76L413 81L410 76L405 73L410 70Z" fill="#4338CA"/>
+</svg>

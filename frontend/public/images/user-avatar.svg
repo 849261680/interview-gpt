@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="128" cy="128" r="128" fill="#EBF4FF"/>
+  
+  <!-- 用户头像轮廓 -->
+  <circle cx="128" cy="96" r="48" fill="#3182CE"/>
+  <path d="M80 190C80 163.49 101.49 142 128 142C154.51 142 176 163.49 176 190V208H80V190Z" fill="#3182CE"/>
+  
+  <!-- 面部特征简化 -->
+  <circle cx="110" cy="96" r="8" fill="#EBF4FF"/>
+  <circle cx="146" cy="96" r="8" fill="#EBF4FF"/>
+  <path d="M110 116C110 116 119 124 128 124C137 124 146 116 146 116" stroke="#EBF4FF" stroke-width="4" stroke-linecap="round"/>
+</svg>

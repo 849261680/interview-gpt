@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="128" cy="128" r="128" fill="#F0F7F4"/>
+  
+  <!-- 行为面试官简化头像 - 成熟管理者特征 -->
+  <circle cx="128" cy="100" r="48" fill="#26B894"/>
+  <rect x="80" y="160" width="96" height="48" rx="24" fill="#26B894"/>
+  
+  <!-- 领带 -->
+  <path d="M128 148L138 180L128 210L118 180L128 148Z" fill="#2D3748"/>
+  
+  <!-- 眉毛和眼睛 -->
+  <path d="M108 94C108 94 116 90 128 90C140 90 148 94 148 94" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="114" cy="104" r="6" fill="#FFFFFF"/>
+  <circle cx="142" cy="104" r="6" fill="#FFFFFF"/>
+  
+  <!-- 团队协作图标 -->
+  <circle cx="128" cy="210" r="12" fill="#26B894"/>
+  <circle cx="110" cy="200" r="10" fill="#26B894"/>
+  <circle cx="146" cy="200" r="10" fill="#26B894"/>
+  <circle cx="94" cy="210" r="8" fill="#26B894"/>
+  <circle cx="162" cy="210" r="8" fill="#26B894"/>
+</svg>

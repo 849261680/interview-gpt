@@ -1,0 +1,81 @@
+# Web框架
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# 数据验证和设置
+pydantic>=2.4.2
+pydantic-settings>=2.0.0
+
+# 数据库
+sqlalchemy>=2.0.22
+python-dotenv>=1.0.0
+
+# 文件上传
+python-multipart>=0.0.6
+aiosqlite>=0.19.0
+
+# WebSocket支持
+websockets>=11.0.3
+
+# HTTP客户端
+httpx>=0.25.0
+
+# 认证和安全
+python-jose>=3.3.0
+passlib>=1.7.4
+bcrypt>=4.0.1
+
+# AI和机器学习
+crewai>=0.5.0
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.10
+langchain-openai>=0.0.5
+
+# HTTP请求
+requests>=2.30.0
+
+# 向量数据库
+chromadb>=0.4.18
+
+# 文本处理
+tiktoken>=0.5.1
+
+# 测试框架
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+coverage>=7.3.0
+pytest-timeout>=2.1.0
+pytest-html>=4.1.1
+pytest-xdist>=3.3.1
+
+# 系统监控
+psutil>=5.9.0
+
+# 异步文件操作
+aiofiles>=23.2.1
+
+# 数据生成
+faker>=20.1.0
+
+# 文档处理
+PyPDF2>=3.0.1
+python-docx>=0.8.11
+openpyxl>=3.1.2
+
+# 数据分析
+pandas>=2.0.0
+
+# 自然语言处理
+nltk>=3.8.1
+spacy>=3.7.0
+
+# MiniMax MCP支持
+minimax-mcp>=0.0.1
+mcp>=1.0.0
+
+# Google Cloud Speech
+google-cloud-speech>=2.21.0
+google-auth>=2.23.0

@@ -1,0 +1,2484 @@
+2025-05-27 21:59:55,372 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 21:59:55,372 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 21:59:55,691 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 21:59:55,973 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 21:59:55,973 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 21:59:56,001 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 21:59:56,002 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 21:59:56,002 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 21:59:56,002 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 21:59:56,002 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 21:59:56,002 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 21:59:56,003 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 21:59:56,004 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 21:59:56,045 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 21:59:56,051 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 21:59:56,346 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 21:59:56,586 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 21:59:56,586 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:06:26,680 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:06:26,686 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 200 | 处理时间: 0.0074秒
+2025-05-27 22:06:26,690 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:06:26,697 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:06:26,713 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0231秒
+2025-05-27 22:06:33,701 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:06:33,704 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0028秒
+2025-05-27 22:06:33,711 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:06:33,719 - src.api.speech - INFO - [abab6.5s-chat_sda ] Received request for /minimax-mcp/chat
+2025-05-27 22:06:33,723 - src.api.speech - DEBUG - [abab6.5s-chat_sda ] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:06:33,724 - src.api.speech - WARNING - [abab6.5s-chat_sda ] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:06:33,724 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:06:33,724 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:06:33,725 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:06:33,725 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:06:33,726 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:06:33,726 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:06:33,726 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'sda ...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4,
+      "completion_tokens": 40,
+      "total_tokens": 44
+    }
+  }
+}
+2025-05-27 22:06:33,727 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:06:33,728 - src.api.speech - INFO - [abab6.5s-chat_sda ] Successfully processed chat completion request.
+2025-05-27 22:06:33,729 - src.api.speech - DEBUG - [abab6.5s-chat_sda ] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'sda ...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 4,
+    "completion_tokens": 40,
+    "total_tokens": 44
+  }
+}
+2025-05-27 22:06:33,737 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0268秒
+2025-05-27 22:06:43,769 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:06:43,775 - src.api.speech - INFO - [abab6.5s-chat_asd ] Received request for /minimax-mcp/chat
+2025-05-27 22:06:43,775 - src.api.speech - DEBUG - [abab6.5s-chat_asd ] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:06:43,776 - src.api.speech - WARNING - [abab6.5s-chat_asd ] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:06:43,777 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:06:43,777 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:06:43,777 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:06:43,777 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:06:43,778 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:06:43,778 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:06:43,779 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'asd ...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4,
+      "completion_tokens": 40,
+      "total_tokens": 44
+    }
+  }
+}
+2025-05-27 22:06:43,779 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:06:43,785 - src.api.speech - INFO - [abab6.5s-chat_asd ] Successfully processed chat completion request.
+2025-05-27 22:06:43,786 - src.api.speech - DEBUG - [abab6.5s-chat_asd ] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'asd ...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 4,
+    "completion_tokens": 40,
+    "total_tokens": 44
+  }
+}
+2025-05-27 22:06:43,793 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0239秒
+2025-05-27 22:06:59,490 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:06:59,491 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:06:59,494 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0043秒
+2025-05-27 22:07:00,101 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:07:00,102 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:07:00,104 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0036秒
+2025-05-27 22:07:00,760 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:07:00,762 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:07:00,764 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0043秒
+2025-05-27 22:07:01,339 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:07:01,341 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:07:01,343 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0039秒
+2025-05-27 22:07:05,642 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:07:05,643 - src.api.speech - INFO - [abab6.5s-chat_asd asd ] Received request for /minimax-mcp/chat
+2025-05-27 22:07:05,644 - src.api.speech - DEBUG - [abab6.5s-chat_asd asd ] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:07:05,644 - src.api.speech - WARNING - [abab6.5s-chat_asd asd ] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:07:05,644 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:07:05,644 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:07:05,644 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:07:05,645 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:07:05,645 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:07:05,645 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:07:05,645 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'asd asd ...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 8,
+      "completion_tokens": 40,
+      "total_tokens": 48
+    }
+  }
+}
+2025-05-27 22:07:05,646 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:07:05,646 - src.api.speech - INFO - [abab6.5s-chat_asd asd ] Successfully processed chat completion request.
+2025-05-27 22:07:05,646 - src.api.speech - DEBUG - [abab6.5s-chat_asd asd ] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'asd asd ...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 8,
+    "completion_tokens": 40,
+    "total_tokens": 48
+  }
+}
+2025-05-27 22:07:05,647 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0051秒
+2025-05-27 22:07:08,477 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:07:08,480 - src.api.speech - INFO - [abab6.5s-chat_sad ] Received request for /minimax-mcp/chat
+2025-05-27 22:07:08,480 - src.api.speech - DEBUG - [abab6.5s-chat_sad ] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "sad "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:07:08,480 - src.api.speech - WARNING - [abab6.5s-chat_sad ] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:07:08,480 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:07:08,481 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "sad "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:07:08,481 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:07:08,481 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "sda "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd asd "
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "sad "
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:07:08,482 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:07:08,482 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:07:08,482 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'sad ...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4,
+      "completion_tokens": 40,
+      "total_tokens": 44
+    }
+  }
+}
+2025-05-27 22:07:08,482 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:07:08,482 - src.api.speech - INFO - [abab6.5s-chat_sad ] Successfully processed chat completion request.
+2025-05-27 22:07:08,482 - src.api.speech - DEBUG - [abab6.5s-chat_sad ] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'sad ...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 4,
+    "completion_tokens": 40,
+    "total_tokens": 44
+  }
+}
+2025-05-27 22:07:08,486 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0087秒
+2025-05-27 22:08:04,256 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:08:04,258 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/chat | 状态码: 400 | 处理时间: 0.0014秒
+2025-05-27 22:09:51,700 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:09:51,700 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:09:51,979 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:09:52,260 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:09:52,260 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:09:52,294 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:09:52,295 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:09:52,295 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:09:52,295 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:09:52,295 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:09:52,295 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:09:52,296 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:09:52,297 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:09:52,342 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:09:52,351 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:09:52,633 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:09:52,886 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:09:52,886 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:10:48,837 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:10:48,837 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:10:49,175 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:10:49,444 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:10:49,444 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:10:49,474 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:10:49,474 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:10:49,474 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:10:49,474 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:10:49,474 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:10:49,474 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:10:49,475 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:10:49,475 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:10:49,513 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:10:49,519 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:10:49,826 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:10:50,059 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:10:50,059 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:11:02,879 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:11:02,880 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/chat | 状态码: 400 | 处理时间: 0.0019秒
+2025-05-27 22:11:21,150 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:11:21,153 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:11:21,173 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0229秒
+2025-05-27 22:11:21,764 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:11:21,766 - src.api.speech - INFO - [abab6.5s-chat_as] Received request for /minimax-mcp/chat
+2025-05-27 22:11:21,766 - src.api.speech - DEBUG - [abab6.5s-chat_as] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:11:21,766 - src.api.speech - WARNING - [abab6.5s-chat_as] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:11:21,767 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:11:21,767 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:21,767 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:11:21,767 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:21,768 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:11:21,768 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:11:21,768 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'as...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2,
+      "completion_tokens": 40,
+      "total_tokens": 42
+    }
+  }
+}
+2025-05-27 22:11:21,769 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:11:21,770 - src.api.speech - INFO - [abab6.5s-chat_as] Successfully processed chat completion request.
+2025-05-27 22:11:21,770 - src.api.speech - DEBUG - [abab6.5s-chat_as] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'as...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2,
+    "completion_tokens": 40,
+    "total_tokens": 42
+  }
+}
+2025-05-27 22:11:21,773 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0089秒
+2025-05-27 22:11:50,000 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:11:50,008 - src.api.speech - INFO - [abab6.5s-chat_是] Received request for /minimax-mcp/chat
+2025-05-27 22:11:50,009 - src.api.speech - DEBUG - [abab6.5s-chat_是] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:11:50,015 - src.api.speech - WARNING - [abab6.5s-chat_是] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:11:50,016 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:11:50,016 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:50,017 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:11:50,017 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:50,018 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:11:50,018 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:11:50,018 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'\u662f...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1,
+      "completion_tokens": 40,
+      "total_tokens": 41
+    }
+  }
+}
+2025-05-27 22:11:50,018 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:11:50,019 - src.api.speech - INFO - [abab6.5s-chat_是] Successfully processed chat completion request.
+2025-05-27 22:11:50,019 - src.api.speech - DEBUG - [abab6.5s-chat_是] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'是...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1,
+    "completion_tokens": 40,
+    "total_tokens": 41
+  }
+}
+2025-05-27 22:11:50,020 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0203秒
+2025-05-27 22:11:55,646 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/chat | 客户端: 127.0.0.1
+2025-05-27 22:11:55,655 - src.api.speech - INFO - [abab6.5s-chat_asd] Received request for /minimax-mcp/chat
+2025-05-27 22:11:55,662 - src.api.speech - DEBUG - [abab6.5s-chat_asd] Request body: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": true
+}
+2025-05-27 22:11:55,662 - src.api.speech - WARNING - [abab6.5s-chat_asd] Received stream=True for non-streaming endpoint /minimax-mcp/chat. Forcing stream=False.
+2025-05-27 22:11:55,662 - src.services.speech_service - INFO - SpeechService: minimax_chat_completion called with model abab6.5s-chat
+2025-05-27 22:11:55,662 - src.services.speech_service - DEBUG - SpeechService: Full request: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:55,663 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 收到聊天完成请求，模型: abab6.5s-chat
+2025-05-27 22:11:55,663 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 完整请求: {
+  "model": "abab6.5s-chat",
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "system",
+      "content": "你是一位资深的技术面试官，名叫李工。你需要：\n1. 评估候选人的技术能力和解决问题的思路\n2. 提出有深度的技术问题，涵盖编程、系统设计、算法等\n3. 根据候选人的回答进行追问，深入了解其技术水平\n4. 保持专业但友好的态度\n5. 每次回复控制在50-100字以内，保持对话流畅\n\n请用专业、简洁的语言进行面试。"
+    },
+    {
+      "role": "assistant",
+      "content": "你好！我是李工，负责今天的技术面试。让我们开始吧！"
+    },
+    {
+      "role": "assistant",
+      "content": "请先简单介绍一下你自己，包括你的技术背景和工作经验。"
+    },
+    {
+      "role": "user",
+      "content": "as"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "是"
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    },
+    {
+      "role": "user",
+      "content": "asd"
+    }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "top_p": 0.9,
+  "stream": false
+}
+2025-05-27 22:11:55,663 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 调用 MiniMax 聊天 API
+2025-05-27 22:11:55,663 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 已收到 MiniMax API 响应
+2025-05-27 22:11:55,664 - src.services.speech.minimax_chat_service - DEBUG - [MinimaxChatService] 原始响应数据: {
+  "success": true,
+  "data": {
+    "choices": [
+      {
+        "message": {
+          "content": "\u8fd9\u662f\u5bf9'asd...'\u7684\u6a21\u62dfAI\u56de\u590d\u3002\u8fd9\u6761\u56de\u590d\u6765\u81ea MiniMax \u6a21\u62df\u670d\u52a1\u3002"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 3,
+      "completion_tokens": 40,
+      "total_tokens": 43
+    }
+  }
+}
+2025-05-27 22:11:55,664 - src.services.speech.minimax_chat_service - INFO - [MinimaxChatService] 成功解析聊天完成响应
+2025-05-27 22:11:55,664 - src.api.speech - INFO - [abab6.5s-chat_asd] Successfully processed chat completion request.
+2025-05-27 22:11:55,665 - src.api.speech - DEBUG - [abab6.5s-chat_asd] Response from service: {
+  "choices": [
+    {
+      "message": {
+        "content": "这是对'asd...'的模拟AI回复。这条回复来自 MiniMax 模拟服务。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 3,
+    "completion_tokens": 40,
+    "total_tokens": 43
+  }
+}
+2025-05-27 22:11:55,666 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/chat | 状态码: 200 | 处理时间: 0.0201秒
+2025-05-27 22:16:28,837 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:16:28,837 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:16:29,142 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:16:29,398 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:16:29,398 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:16:29,431 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:16:29,432 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:16:29,432 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:16:29,432 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:16:29,432 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:16:29,432 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:16:29,433 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:16:29,433 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:16:29,466 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:16:29,471 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:16:29,732 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:16:29,916 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:16:29,917 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:16:57,252 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:16:57,252 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:16:57,535 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:16:57,796 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:16:57,796 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:16:57,825 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:16:57,825 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:16:57,825 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:16:57,825 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:16:57,825 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:16:57,825 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:16:57,829 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:16:57,829 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:16:57,863 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:16:57,868 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:16:58,144 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:16:58,412 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:16:58,413 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:17:26,683 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:17:26,683 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:17:26,996 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:17:27,420 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:17:27,421 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:17:27,488 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:17:27,489 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:17:27,489 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:17:27,489 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:17:27,489 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:17:27,489 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:17:27,490 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:17:27,491 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:17:27,578 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:17:27,586 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:17:27,987 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:17:28,183 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:17:28,193 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:17:28,193 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:32:39,507 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:32:39,507 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:32:39,853 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:32:40,203 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:32:40,204 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:32:40,244 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:32:40,244 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:32:40,244 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:32:40,245 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:32:40,245 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:32:40,245 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:32:40,260 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:32:40,263 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:32:40,343 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:32:40,351 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:32:40,689 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:32:40,908 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:32:40,915 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:32:40,915 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:35:30,252 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:35:30,255 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 400 | 处理时间: 0.0025秒
+2025-05-27 22:35:32,150 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:35:32,151 - interview-gpt.request - INFO - 请求完成: OPTIONS /deepseek/chat | 状态码: 400 | 处理时间: 0.0013秒
+2025-05-27 22:37:35,230 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:37:35,231 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 400 | 处理时间: 0.0010秒
+2025-05-27 22:37:48,205 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:37:48,220 - interview-gpt.request - INFO - 请求完成: OPTIONS /deepseek/chat | 状态码: 400 | 处理时间: 0.0149秒
+2025-05-27 22:39:05,329 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:39:05,329 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:39:05,766 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:39:06,064 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:39:06,064 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:39:06,094 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:39:06,094 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:39:06,094 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:39:06,095 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:39:06,095 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:39:06,095 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:39:06,096 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:39:06,096 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:39:06,133 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:39:06,138 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:39:06,420 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:39:06,613 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:39:06,619 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:39:06,620 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:40:17,195 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:40:17,195 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:40:17,508 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:40:17,772 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:40:17,772 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:40:17,803 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:40:17,804 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:40:17,804 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:40:17,804 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:40:17,804 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:40:17,804 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:40:17,805 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:40:17,805 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:40:17,841 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:40:17,847 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:40:18,099 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:40:18,300 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:40:18,306 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:40:18,307 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:40:47,517 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:40:47,521 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 400 | 处理时间: 0.0038秒
+2025-05-27 22:40:53,923 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:40:53,928 - interview-gpt.request - INFO - 请求完成: OPTIONS /deepseek/chat | 状态码: 400 | 处理时间: 0.0049秒
+2025-05-27 22:43:40,556 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:43:40,556 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:43:40,982 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:43:41,317 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:43:41,317 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:43:41,352 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:43:41,352 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:43:41,352 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:43:41,352 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:43:41,353 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:43:41,353 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:43:41,354 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:43:41,354 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:43:41,404 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:43:41,412 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:43:41,704 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:43:41,903 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:43:41,932 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:43:41,933 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:43:51,243 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:43:51,243 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:43:51,467 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:43:51,647 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:43:51,647 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:43:51,678 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:43:51,678 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:43:51,678 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:43:51,678 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:43:51,678 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:43:51,678 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:43:51,678 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:43:51,679 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:43:51,703 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:43:51,708 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:43:51,887 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:43:52,030 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:43:52,035 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:43:52,035 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:44:08,322 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:44:08,323 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:44:08,626 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:44:09,045 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:44:09,046 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:44:09,100 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:44:09,101 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:44:09,101 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:44:09,101 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:44:09,101 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:44:09,101 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:44:09,103 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:44:09,103 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:44:09,155 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:44:09,163 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:44:09,448 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:44:09,635 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:44:09,641 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:44:09,641 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:44:36,092 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:44:36,118 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 200 | 处理时间: 0.0258秒
+2025-05-27 22:44:36,127 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:44:36,134 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:44:36,150 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0225秒
+2025-05-27 22:44:39,660 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:44:39,674 - interview-gpt.request - INFO - 请求完成: OPTIONS /deepseek/chat | 状态码: 200 | 处理时间: 0.0132秒
+2025-05-27 22:44:39,687 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:44:39,716 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0296秒
+2025-05-27 22:46:32,332 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:46:32,333 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:46:32,636 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:46:32,931 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:46:32,931 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:46:32,972 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:46:32,972 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:46:32,972 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:46:32,972 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:46:32,972 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:46:32,972 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:46:32,973 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:46:32,973 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:46:33,020 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:46:33,029 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:46:33,336 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:46:33,571 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:46:33,577 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:46:33,577 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:46:53,032 - interview-gpt.request - DEBUG - 开始处理请求: GET /api/deepseek/status | 客户端: 127.0.0.1
+2025-05-27 22:46:53,033 - interview-gpt.request - INFO - 请求完成: GET /api/deepseek/status | 状态码: 200 | 处理时间: 0.0016秒
+2025-05-27 22:46:53,037 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:46:53,038 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/deepseek/chat | 状态码: 200 | 处理时间: 0.0009秒
+2025-05-27 22:46:53,042 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:46:53,043 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 2
+2025-05-27 22:47:02,260 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 22:47:02,263 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 9.2211秒
+2025-05-27 22:49:09,288 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 22:49:09,288 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 22:49:09,607 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 22:49:09,870 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 22:49:09,870 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 22:49:09,900 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 22:49:09,900 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 22:49:09,900 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 22:49:09,900 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 22:49:09,900 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 22:49:09,900 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 22:49:09,903 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 22:49:09,903 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 22:49:09,958 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:49:09,966 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 22:49:10,284 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 22:49:10,494 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 22:49:10,502 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 22:49:10,502 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 22:49:32,494 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 22:49:32,497 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 22:49:32,508 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0141秒
+2025-05-27 22:49:34,242 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:49:34,244 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0025秒
+2025-05-27 22:49:38,122 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:49:38,126 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0038秒
+2025-05-27 22:52:26,396 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:52:26,399 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0036秒
+2025-05-27 22:52:38,401 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:52:38,418 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0168秒
+2025-05-27 22:56:48,905 - interview-gpt.request - DEBUG - 开始处理请求: GET /api/deepseek/status | 客户端: 127.0.0.1
+2025-05-27 22:56:48,908 - interview-gpt.request - INFO - 请求完成: GET /api/deepseek/status | 状态码: 200 | 处理时间: 0.0026秒
+2025-05-27 22:57:22,302 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 22:57:22,306 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 1
+2025-05-27 22:57:29,536 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 22:57:29,537 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 7.2348秒
+2025-05-27 23:00:46,750 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:00:46,793 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 1
+2025-05-27 23:01:00,155 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:01:00,174 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 13.4276秒
+2025-05-27 23:01:00,190 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:01:00,192 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0026秒
+2025-05-27 23:04:14,637 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:04:14,656 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 200 | 处理时间: 0.0219秒
+2025-05-27 23:04:14,662 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:04:14,678 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:04:14,695 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0332秒
+2025-05-27 23:04:18,115 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:04:18,116 - interview-gpt.request - INFO - 请求完成: OPTIONS /deepseek/chat | 状态码: 200 | 处理时间: 0.0010秒
+2025-05-27 23:04:18,120 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:04:18,123 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0036秒
+2025-05-27 23:04:31,430 - interview-gpt.request - DEBUG - 开始处理请求: POST /deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:04:31,434 - interview-gpt.request - INFO - 请求完成: POST /deepseek/chat | 状态码: 404 | 处理时间: 0.0041秒
+2025-05-27 23:08:50,410 - interview-gpt - INFO - 启动 Interview-GPT API, 日志级别: DEBUG, 日志文件: logs/interview_gpt.log
+2025-05-27 23:08:50,410 - interview-gpt - INFO - 已配置根日志记录器，所有模块日志都将写入文件: logs/interview_gpt.log
+2025-05-27 23:08:50,667 - src.db.init_db - INFO - 数据库表结构已创建
+2025-05-27 23:08:50,906 - src.services.ai.base_ai_client.DeepSeekClient - INFO - 初始化DEEPSEEK客户端: https://api.deepseek.com
+2025-05-27 23:08:50,906 - src.services.ai.ai_service_manager - INFO - DEEPSEEK客户端初始化成功
+2025-05-27 23:08:50,935 - src.services.ai.base_ai_client.MinimaxClient - INFO - 初始化MiniMax客户端: https://api.minimax.chat
+2025-05-27 23:08:50,935 - src.services.ai.ai_service_manager - INFO - MiniMax客户端初始化成功
+2025-05-27 23:08:50,935 - src.services.ai.ai_service_manager - INFO - OpenAI客户端配置可用（未实现）
+2025-05-27 23:08:50,935 - src.services.ai.ai_service_manager - INFO - 跳过模拟AI客户端初始化，将使用真实服务
+2025-05-27 23:08:50,935 - src.services.ai.ai_service_manager - INFO - AI服务管理器初始化完成，主要服务: deepseek
+2025-05-27 23:08:50,936 - src.services.ai.ai_service_manager - INFO - 可用服务: deepseek, minimax, openai
+2025-05-27 23:08:50,936 - src.services.ai.crewai_integration - WARNING - CrewAI功能禁用，项目将使用真实AI服务而非多智能体协作
+2025-05-27 23:08:50,936 - src.services.ai.crewai_integration - ERROR - CrewAI不可用，无法使用多智能体功能
+2025-05-27 23:08:50,966 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 23:08:50,971 - src.services.speech.speech_service - INFO - 语音服务初始化完成
+2025-05-27 23:08:51,213 - src.services.resume_parser - INFO - 简历解析器初始化完成
+2025-05-27 23:08:51,394 - src.services.ai.deepseek_service - INFO - DeepSeek 服务初始化完成
+2025-05-27 23:08:51,404 - src.services.speech.minimax_chat_service - INFO - MiniMax 聊天服务初始化完成
+2025-05-27 23:08:51,405 - src.services.speech_service - INFO - 语音服务初始化完成: {'openai': {'available': True, 'stt': True, 'tts': True}, 'azure': {'available': False, 'stt': True, 'tts': True}, 'google': {'available': True, 'stt': True, 'tts': True}, 'minimax_mcp': {'available': True, 'stt': True, 'tts': True}, 'browser': {'available': True, 'stt': False, 'tts': True}}
+2025-05-27 23:09:16,782 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:09:16,783 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 200 | 处理时间: 0.0011秒
+2025-05-27 23:09:16,798 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:09:16,802 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:09:16,816 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0185秒
+2025-05-27 23:09:21,607 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:09:21,610 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/deepseek/chat | 状态码: 200 | 处理时间: 0.0030秒
+2025-05-27 23:09:21,615 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:09:21,621 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 4
+2025-05-27 23:09:28,712 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:09:28,716 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 7.1006秒
+2025-05-27 23:09:28,731 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:09:28,808 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:09:28,822 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0905秒
+2025-05-27 23:09:53,315 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:09:53,316 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 6
+2025-05-27 23:10:02,780 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:10:02,782 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 9.4678秒
+2025-05-27 23:10:02,789 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:10:02,791 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:10:02,798 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0081秒
+2025-05-27 23:10:16,614 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:10:16,616 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 3
+2025-05-27 23:10:21,708 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:10:21,709 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 5.0950秒
+2025-05-27 23:10:21,713 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:10:21,715 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:10:21,717 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0041秒
+2025-05-27 23:10:32,001 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:10:32,002 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 5
+2025-05-27 23:10:37,699 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:10:37,701 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 5.7008秒
+2025-05-27 23:10:37,708 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:10:37,710 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:10:37,716 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0079秒
+2025-05-27 23:13:25,894 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:13:25,897 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 7
+2025-05-27 23:13:31,744 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:13:31,745 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 5.8513秒
+2025-05-27 23:13:31,755 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:13:31,757 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:13:31,760 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0044秒
+2025-05-27 23:14:06,237 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/deepseek/chat | 客户端: 127.0.0.1
+2025-05-27 23:14:06,238 - src.services.ai.deepseek_service - INFO - 调用 DeepSeek API 生成回答，消息数量: 9
+2025-05-27 23:14:13,567 - src.services.ai.deepseek_service - INFO - DeepSeek API 调用成功
+2025-05-27 23:14:13,570 - interview-gpt.request - INFO - 请求完成: POST /api/deepseek/chat | 状态码: 200 | 处理时间: 7.3331秒
+2025-05-27 23:14:13,578 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-27 23:14:13,580 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-27 23:14:13,585 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0070秒
+2025-05-28 01:00:21,249 - interview-gpt.request - DEBUG - 开始处理请求: OPTIONS /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-28 01:00:21,255 - interview-gpt.request - INFO - 请求完成: OPTIONS /api/speech/minimax-mcp/text-to-speech | 状态码: 200 | 处理时间: 0.0067秒
+2025-05-28 01:00:21,259 - interview-gpt.request - DEBUG - 开始处理请求: POST /api/speech/minimax-mcp/text-to-speech | 客户端: 127.0.0.1
+2025-05-28 01:00:21,263 - src.middlewares.error_handler - ERROR - 异常发生在 POST http://localhost:8000/api/speech/minimax-mcp/text-to-speech: name 'datetime' is not defined
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 159, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/middlewares/error_handler.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 165, in call_next
+    raise app_exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/base.py", line 151, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 299, in app
+    raise e
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/venv311/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/psx849261680/Desktop/Interview-GPT/backend/src/api/speech.py", line 308, in minimax_mcp_text_to_speech
+    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}"
+                       ^^^^^^^^
+NameError: name 'datetime' is not defined
+2025-05-28 01:00:21,267 - interview-gpt.request - INFO - 请求完成: POST /api/speech/minimax-mcp/text-to-speech | 状态码: 500 | 处理时间: 0.0081秒
