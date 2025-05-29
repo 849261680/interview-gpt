@@ -10,6 +10,7 @@ from .hr_interviewer import HRInterviewer
 from .behavioral_interviewer import BehavioralInterviewer
 from .product_manager_interviewer import ProductManagerInterviewer
 from .senior_interviewer import SeniorInterviewer
+from .interview_coordinator import InterviewCoordinator
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -27,6 +28,7 @@ class InterviewerFactory:
         "behavioral": BehavioralInterviewer,
         "product_manager": ProductManagerInterviewer,
         "senior": SeniorInterviewer,
+        "coordinator": InterviewCoordinator,
     }
     
     # 面试官实例缓存
@@ -78,6 +80,8 @@ class InterviewerFactory:
             "technical": "技术面试官",
             "hr": "HR面试官",
             "behavioral": "行为面试官",
+            "product_manager": "产品面试官",
+            "coordinator": "面试协调员",
         }
     
     @classmethod
@@ -88,4 +92,15 @@ class InterviewerFactory:
         Returns:
             list: 面试官ID列表，按照面试进行的顺序排列
         """
-        return ["technical", "behavioral", "hr"]
+        return ["coordinator", "technical", "product_manager", "behavioral", "hr", "coordinator"]
+    
+    @classmethod
+    def get_crewai_enabled(cls) -> bool:
+        """
+        检查CrewAI多Agent协同面试系统是否启用
+        
+        Returns:
+            bool: 是否启用CrewAI多Agent协同面试系统
+        """
+        from ..services.ai.crewai_integration import crewai_integration
+        return crewai_integration.is_available()

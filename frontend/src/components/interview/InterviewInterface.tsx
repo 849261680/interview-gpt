@@ -53,7 +53,8 @@ const InterviewInterface: React.FC<InterviewInterfaceProps> = ({
   const [messages, setMessages] = useState<InterviewMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [interviewStatus, setInterviewStatus] = useState<InterviewStatus | null>(null);
-  const [currentInterviewer, setCurrentInterviewer] = useState<string>('technical');
+  // 不再硬编码初始面试官类型，而是从后端动态获取
+  const [currentInterviewer, setCurrentInterviewer] = useState<string>('');
   const [interviewProgress, setInterviewProgress] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -137,6 +138,9 @@ const InterviewInterface: React.FC<InterviewInterfaceProps> = ({
         console.log('面试WebSocket连接成功');
         setIsConnected(true);
         setIsLoading(false);
+        
+        // 连接成功后立即请求当前面试状态和活跃面试官信息
+        socketService.requestCurrentStatus();
         
         // 启动实时评估
         startRealTimeAssessment();
@@ -333,12 +337,17 @@ const InterviewInterface: React.FC<InterviewInterfaceProps> = ({
   // 获取面试官信息
   const getInterviewerInfo = (type: string) => {
     const interviewers = {
+      coordinator: { name: '面试协调员', avatar: '🧑‍💼', color: 'bg-teal-500' },
       technical: { name: '技术面试官', avatar: '👨‍💻', color: 'bg-blue-500' },
       hr: { name: 'HR面试官', avatar: '👩‍💼', color: 'bg-green-500' },
       behavioral: { name: '行为面试官', avatar: '👨‍🏫', color: 'bg-purple-500' },
+      product_manager: { name: '产品面试官', avatar: '🧩', color: 'bg-orange-500' },
       final: { name: '终面官', avatar: '👔', color: 'bg-gray-700' }
     };
-    return interviewers[type as keyof typeof interviewers] || interviewers.technical;
+    console.log(`[DEBUG] 获取面试官信息，类型: ${type}`);
+    const interviewer = interviewers[type as keyof typeof interviewers] || interviewers.coordinator;
+    console.log(`[DEBUG] 返回面试官信息:`, interviewer);
+    return interviewer;
   };
 
   // 格式化消息时间
@@ -531,6 +540,16 @@ const InterviewInterface: React.FC<InterviewInterfaceProps> = ({
                 onRecordingStop={() => setIsRecording(false)}
                 disabled={!isConnected || isLoading}
                 className="flex-shrink-0"
+                onTranscription={(text: string) => {
+                  // 处理语音识别结果
+                  setCurrentMessage(text);
+                }}
+                onAudioResponse={(audioUrl: string) => {
+                  // 处理音频响应
+                  console.log('收到音频响应:', audioUrl);
+                }}
+                isInterviewActive={isConnected && !isLoading}
+                currentInterviewer={currentInterviewer}
               />
               
               {messages.length > 0 && messages[messages.length - 1].sender_type === 'interviewer' && (

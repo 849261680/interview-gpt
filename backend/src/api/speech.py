@@ -11,6 +11,7 @@ import tempfile
 import os
 import logging
 import base64
+import datetime
 
 from ..services.speech_service import speech_service
 
@@ -305,7 +306,7 @@ async def minimax_mcp_text_to_speech(request: TTSRequest):
     """
     MiniMax MCP专用语音合成API
     """
-    request_id = f"req_{datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}" 
+    request_id = f"req_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{id(request)}" 
     try:
         logger.info(f"[{request_id}] 收到MiniMax MCP TTS请求: {request}")
         

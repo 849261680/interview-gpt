@@ -49,3 +49,6 @@ debug.log
 # Specific to this project
 .vercel
 .railway
+
+# MiniMax MCP (embedded git repository)
+MiniMax-MCP/

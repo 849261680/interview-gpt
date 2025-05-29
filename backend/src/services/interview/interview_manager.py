@@ -1,6 +1,6 @@
 """
 面试流程管理器
-负责管理整个面试过程、面试官轮换和面试状态
+负责管理整个面试过程、面试官轮换和状态转换
 提供实时通信和状态更新
 """
 from typing import List, Dict, Any, Optional, Tuple
@@ -9,18 +9,15 @@ import asyncio
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from ...models.schemas import Interview, Message
+from ...models.schemas import Interview, Message, User
 from ...agents.interviewer_factory import InterviewerFactory
 from ...schemas.interview import MessageCreate
 
-# 设置日志
-logger = logging.getLogger(__name__)
-
-# 面试阶段定义
+# 临时定义 INTERVIEW_STAGES
 INTERVIEW_STAGES = {
     "introduction": {
         "description": "面试介绍阶段",
-        "interviewer_id": "system",
+        "interviewer_id": "coordinator",  # 使用面试协调员作为第一个面试官
         "max_messages": 2,
         "next_stage": "technical"
     },
@@ -28,13 +25,7 @@ INTERVIEW_STAGES = {
         "description": "技术面试阶段",
         "interviewer_id": "technical",
         "max_messages": 8,
-        "next_stage": "hr"
-    },
-    "hr": {
-        "description": "人力资源面试阶段",
-        "interviewer_id": "hr",
-        "max_messages": 6,
-        "next_stage": "product_manager"
+        "next_stage": "product_manager"  # 修改为产品经理阶段
     },
     "product_manager": {
         "description": "产品经理面试阶段",
@@ -46,28 +37,30 @@ INTERVIEW_STAGES = {
         "description": "行为面试阶段",
         "interviewer_id": "behavioral",
         "max_messages": 6,
-        "next_stage": "senior"
+        "next_stage": "hr"  # 修改为HR阶段
     },
-    "senior": {
-        "description": "总面试官阶段",
-        "interviewer_id": "senior",
+    "hr": {
+        "description": "人力资源面试阶段",
+        "interviewer_id": "hr",
+        "max_messages": 6,
+        "next_stage": "conclusion_coordinator"  # 修改为协调员总结阶段
+    },
+    "conclusion_coordinator": {
+        "description": "协调员总结阶段",
+        "interviewer_id": "coordinator",  # 使用面试协调员进行总结
         "max_messages": 4,
-        "next_stage": "conclusion"
-    },
-    "conclusion": {
-        "description": "面试总结阶段",
-        "interviewer_id": "system",
-        "max_messages": 2,
         "next_stage": "feedback"
     },
     "feedback": {
         "description": "面试评估反馈阶段",
-        "interviewer_id": "system",
+        "interviewer_id": "coordinator",  # 使用面试协调员提供反馈
         "max_messages": 1,
         "next_stage": None
     }
 }
 
+# 设置日志
+logger = logging.getLogger(__name__)
 
 class InterviewManager:
     """
@@ -84,6 +77,7 @@ class InterviewManager:
             interview_id: 面试ID
             db: 数据库会话
         """
+        logger.info(f"[InterviewManager __init__] Creating instance for Interview ID: {interview_id}") # 新增日志
         self.interview_id = interview_id
         self.db = db
         self.current_stage = "introduction"
@@ -94,7 +88,7 @@ class InterviewManager:
         """
         初始化面试，创建欢迎消息
         """
-        logger.info(f"初始化面试: ID={self.interview_id}")
+        logger.info(f"[initialize_interview START] Initializing for Interview ID: {self.interview_id}") # 新增日志
         
         # 使用传入的db或默认的self.db
         _db = self.db
@@ -114,13 +108,63 @@ class InterviewManager:
         existing_messages = self.db.query(Message).filter(
             Message.interview_id == self.interview_id
         ).count()
+        logger.info(f"[initialize_interview] Interview ID: {self.interview_id}, Found existing_messages: {existing_messages}") # 新增日志
         
         # 如果没有消息，创建欢迎消息
         if existing_messages == 0:
+            logger.info(f"[initialize_interview] existing_messages is 0 for Interview ID: {self.interview_id}. Proceeding with new interview setup.") # 新增日志
+            
+            # 检查是否已有消息，避免重复初始化
+            existing_messages = self.db.query(Message).filter(Message.interview_id == self.interview_id).count()
+            logger.info(f"[initialize_interview] Existing messages for interview {self.interview_id}: {existing_messages}")
+            if existing_messages > 0:
+                logger.info(f"[initialize_interview] Interview {self.interview_id} already has messages. Skipping initialization of welcome message.")
+                # 如果已有消息，尝试恢复当前阶段
+                last_system_message = self.db.query(Message).filter(
+                    Message.interview_id == self.interview_id,
+                    Message.sender_type == "system",
+                    Message.content.like('%当前阶段:%') # 假设系统消息包含阶段信息
+                ).order_by(Message.timestamp.desc()).first()
+                if last_system_message and '当前阶段:' in last_system_message.content:
+                    try:
+                        # 解析示例: "系统消息：当前阶段: technical_interview, 面试官: Technical Interviewer"
+                        stage_info = last_system_message.content.split('当前阶段: ')[1].split(',')[0]
+                        self.current_stage = stage_info
+                        logger.info(f"[initialize_interview] Restored stage to {self.current_stage} for interview {self.interview_id} from existing messages.")
+                    except Exception as e:
+                        logger.error(f"[initialize_interview] Failed to parse stage from message: {last_system_message.content}. Error: {e}")
+                        # 如果解析失败，则回退到默认初始阶段
+                        self.current_stage = self.stages_config[0]["id"]
+                        logger.warning(f"[initialize_interview] Defaulting to initial stage {self.current_stage} for interview {self.interview_id} due to parsing error.")
+                else:
+                     # 如果没有找到包含阶段信息的系统消息，也回退到默认初始阶段
+                    self.current_stage = self.stages_config[0]["id"]
+                    logger.info(f"[initialize_interview] No system message with stage info found. Defaulting to initial stage {self.current_stage} for interview {self.interview_id}.")
+                return
+
+            logger.info(f"[initialize_interview] No existing messages for interview {self.interview_id}. Proceeding with initialization.")
+
+            # 设置初始阶段为面试协调员介绍
+            self.current_stage = self.stages_config[0]["id"] # coordinator_intro
+            logger.info(f"[initialize_interview] Current stage set to: {self.current_stage} for interview {self.interview_id}")
+
+            # 获取面试协调员的实例
+            coordinator = self.interviewer_factory.get_interviewer(self.stages_config[0]["interviewer_id"]) # coordinator
+            if not coordinator:
+                logger.error(f"[initialize_interview] Failed to get Interview Coordinator instance for interview {self.interview_id}.")
+                # 可以在这里抛出异常或采取其他错误处理措施
+                return
+            
+            logger.info(f"[initialize_interview] Interview Coordinator '{coordinator.name}' will start the interview {self.interview_id}.")
+
+            # 创建欢迎消息 (由面试协调员发出)
+            welcome_message_content = f"欢迎参加本次模拟面试！我是您的面试协调员，{coordinator.name}。我将首先向您介绍面试流程，然后引导您进入各个面试环节。准备好了吗？"
             welcome_message = Message(
                 interview_id=self.interview_id,
-                content="欢迎参加模拟面试！我们将从技术面试开始，请放松并准备好回答问题。",
-                sender_type="system"
+                content=welcome_message_content,
+                sender_type="system", # 或者 'ai' 如果协调员被视为AI
+                sender_name=coordinator.name, # 面试协调员的名字
+                interviewer_type=self.stages_config[0]["interviewer_id"] # 'coordinator'
             )
             self.db.add(welcome_message)
             self.db.commit()
@@ -128,8 +172,45 @@ class InterviewManager:
             # 更新消息计数
             self.stage_message_count["introduction"] += 1
             
-            # 创建第一个面试官消息
-            await self.switch_interviewer()
+            # 创建第一个面试官（协调员）的介绍消息
+            initial_stage_config = INTERVIEW_STAGES[self.current_stage] # self.current_stage 应该是 'introduction'
+            initial_interviewer_id = initial_stage_config["interviewer_id"]
+            interviewer = self.interviewer_factory.get_interviewer(initial_interviewer_id)
+
+            logger.info(f"[INITIALIZE_INTERVIEW - NEW] Interview ID: {self.interview_id}")
+            logger.info(f"[INITIALIZE_INTERVIEW - NEW] self.current_stage = '{self.current_stage}'")
+            logger.info(f"[INITIALIZE_INTERVIEW - NEW] initial_stage_config['interviewer_id'] = '{initial_interviewer_id}'")
+            if interviewer:
+                logger.info(f"[INITIALIZE_INTERVIEW - NEW] Fetched interviewer: name='{interviewer.name}', role='{interviewer.role}', id='{interviewer.interviewer_id}'")
+            else:
+                logger.error(f"[INITIALIZE_INTERVIEW - NEW] FAILED to fetch interviewer for id='{initial_interviewer_id}'")
+
+            if not interviewer:
+                logger.error(f"无法为阶段 {self.current_stage} 找到面试官 {initial_interviewer_id}")
+                # 可以抛出异常或返回错误状态
+                return
+
+            interview = self.db.query(Interview).filter(Interview.id == self.interview_id).first()
+            if interview:
+                questions = await interviewer.generate_questions(
+                    position=interview.position,
+                    difficulty=interview.difficulty
+                )
+                intro_question = questions[0] if questions else f"您好，我是{interviewer.name}，{interviewer.role}。我们开始吧。"
+                intro_content = f"您好，我是{interviewer.name}，{interviewer.role}。{intro_question}"
+            else:
+                intro_content = f"您好，我是{interviewer.name}，{interviewer.role}。我们开始面试吧。"
+
+            first_interviewer_message = Message(
+                interview_id=self.interview_id,
+                content=intro_content,
+                sender_type="interviewer",
+                interviewer_id=initial_interviewer_id
+            )
+            self.db.add(first_interviewer_message)
+            self.db.commit()
+            self.stage_message_count[self.current_stage] += 1
+
         else:
             # 加载当前面试阶段
             await self.load_current_stage()
@@ -209,11 +290,12 @@ class InterviewManager:
             response_content = await interviewer.generate_response(messages)
             
             # 保存面试官回复
+            # 更新处理逻辑，确保协调员类型被正确处理
             interviewer_message = Message(
                 interview_id=self.interview_id,
                 content=response_content,
-                sender_type="interviewer" if current_interviewer_id != "system" else "system",
-                interviewer_id=None if current_interviewer_id == "system" else current_interviewer_id
+                sender_type="interviewer",  # 所有类型都作为interviewer处理，包括coordinator
+                interviewer_id=current_interviewer_id  # 直接使用current_interviewer_id，包括coordinator
             )
             db.add(interviewer_message)
             db.commit()
@@ -307,47 +389,48 @@ class InterviewManager:
         # 获取新面试官
         new_interviewer_id = next_stage_config["interviewer_id"]
         
-        # 如果不是系统消息，创建新面试官介绍
-        if new_interviewer_id != "system":
-            interviewer = self.interviewer_factory.get_interviewer(new_interviewer_id)
+        # 如果是有效的面试官ID，创建新面试官介绍
+        # 修改判断逻辑，包含协调员在内
+        interviewer = self.interviewer_factory.get_interviewer(new_interviewer_id)
+        
+        # 获取面试信息
+        interview = self.db.query(Interview).filter(Interview.id == self.interview_id).first()
+        
+        # 生成面试问题
+        if interview:
+            questions = await interviewer.generate_questions(
+                position=interview.position,
+                difficulty=interview.difficulty
+            )
             
-            # 获取面试信息
-            interview = self.db.query(Interview).filter(Interview.id == self.interview_id).first()
+            # 选择第一个问题作为介绍
+            intro_question = questions[0] if questions else f"您好，我是{interviewer.name}，{interviewer.role}。请问您能介绍一下自己吗？"
             
-            # 生成面试问题
-            if interview:
-                questions = await interviewer.generate_questions(
-                    position=interview.position,
-                    difficulty=interview.difficulty
-                )
-                
-                # 选择第一个问题作为介绍
-                intro_question = questions[0] if questions else f"您好，我是{interviewer.name}，{interviewer.role}。请问您能介绍一下自己吗？"
-                
-                # 创建介绍消息
-                intro_content = f"您好，我是{interviewer.name}，{interviewer.role}。{intro_question}"
-                
-                intro_message = Message(
-                    interview_id=self.interview_id,
-                    content=intro_content,
-                    sender_type="interviewer",
-                    interviewer_id=new_interviewer_id
-                )
-                _db.add(intro_message)
-                _db.commit()
-                _db.refresh(intro_message)
-                
-                # 更新阶段消息计数
-                self.stage_message_count[next_stage] += 1
+            # 创建介绍消息
+            intro_content = f"您好，我是{interviewer.name}，{interviewer.role}。{intro_question}"
+            
+            intro_message = Message(
+                interview_id=self.interview_id,
+                content=intro_content,
+                sender_type="interviewer",
+                interviewer_id=new_interviewer_id
+            )
+            _db.add(intro_message)
+            _db.commit()
+            _db.refresh(intro_message)
+            
+            # 更新阶段消息计数
+            self.stage_message_count[next_stage] += 1
         
         # 如果是结束阶段，创建结束消息
-        if next_stage == "conclusion":
-            conclusion_content = "感谢您参加本次模拟面试。我们现在将结束面试并生成评估报告，请稍候查看您的面试反馈。"
+        if next_stage == "conclusion_coordinator":
+            conclusion_content = "感谢您参加本次模拟面试。我作为面试协调员将对您的表现进行总结并生成评估报告，请稍候查看您的面试反馈。"
             
             conclusion_message = Message(
                 interview_id=self.interview_id,
                 content=conclusion_content,
-                sender_type="system"
+                sender_type="interviewer",
+                interviewer_id="coordinator"  # 显式指定这是协调员发出的消息
             )
             self.db.add(conclusion_message)
             self.db.commit()
@@ -463,6 +546,8 @@ class InterviewManager:
                 "success": False,
                 "message": "已经是最后一个阶段"
             }
+        
+        logger.info(f"切换面试阶段: {self.current_stage} -> {next_stage}")
         
         # 切换面试官
         result = await self.switch_interviewer(db)

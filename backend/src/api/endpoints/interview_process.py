@@ -15,6 +15,11 @@ from ...agents.interviewer_factory import InterviewerFactory
 from ...services.interview_service import send_message_service, get_interview_messages_service
 # 替换音频服务导入
 from ...services.speech.speech_service import SpeechService
+# 添加面试管理器导入
+from ...services.interview.interview_manager import get_or_create_interview_manager
+# 添加音频处理函数导入
+from ...services.audio.text_to_speech import get_interviewer_voice, text_to_speech, save_audio_file
+from ...services.audio.speech_recognition import recognize_speech
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -55,9 +60,16 @@ async def send_message(
         interview_manager = await get_or_create_interview_manager(interview_id, db)
         
         # 处理用户消息并获取回复
-        response = await interview_manager.process_user_message(message.content)
+        user_msg, ai_msg = await interview_manager.process_user_message(message.content, db)
         
-        return response
+        # 返回面试官回复消息
+        return MessageResponse(
+            id=ai_msg.id if ai_msg else user_msg.id,
+            content=ai_msg.content if ai_msg else "消息已收到",
+            sender_type=ai_msg.sender_type if ai_msg else "system",
+            interviewer_id=ai_msg.interviewer_id if ai_msg else None,
+            timestamp=ai_msg.timestamp if ai_msg else user_msg.timestamp
+        )
         
     except Exception as e:
         logger.error(f"处理面试消息失败: {str(e)}")
@@ -204,7 +216,7 @@ async def advance_to_next_stage(
         interview_manager = await get_or_create_interview_manager(interview_id, db)
         
         # 切换到下一个面试官
-        response = await interview_manager.switch_interviewer()
+        response = await interview_manager.switch_interviewer(db)
         
         if response is None:
             return {
@@ -247,7 +259,7 @@ async def end_interview(
         interview_manager = await get_or_create_interview_manager(interview_id, db)
         
         # 结束面试
-        await interview_manager.end_interview()
+        await interview_manager.end_interview(db)
         
         return {
             "status": "success",
@@ -376,19 +388,51 @@ async def websocket_endpoint(websocket: WebSocket, interview_id: int, db: Sessio
             msg_data = json.loads(data)
             
             if msg_data["type"] == "message":
-                # 处理用户消息
-                response = await interview_manager.process_user_message(msg_data["content"])
+                # 处理用户消息 - 确保提取正确的内容
+                message_content = msg_data.get("content", "")
+                if isinstance(message_content, dict):
+                    # 如果content是字典，提取其中的content字段
+                    message_content = message_content.get("content", "")
+                elif not isinstance(message_content, str):
+                    # 如果不是字符串，转换为字符串
+                    message_content = str(message_content)
+                
+                if not message_content.strip():
+                    # 发送错误消息
+                    await websocket.send_json({
+                        "type": "error",
+                        "data": {
+                            "message": "消息内容不能为空"
+                        }
+                    })
+                    continue
+                
+                user_msg, ai_msg = await interview_manager.process_user_message(message_content, db)
                 
                 # 广播回复给所有连接
                 for conn in active_connections.get(interview_id, []):
                     await conn.send_json({
                         "type": "message",
-                        "data": response
+                        "data": {
+                            "user_message": {
+                                "id": user_msg.id,
+                                "content": user_msg.content,
+                                "sender_type": user_msg.sender_type,
+                                "timestamp": user_msg.timestamp.isoformat()
+                            },
+                            "ai_message": {
+                                "id": ai_msg.id,
+                                "content": ai_msg.content,
+                                "sender_type": ai_msg.sender_type,
+                                "interviewer_id": ai_msg.interviewer_id,
+                                "timestamp": ai_msg.timestamp.isoformat()
+                            } if ai_msg else None
+                        }
                     })
             
             elif msg_data["type"] == "next_stage":
                 # 切换到下一个阶段
-                response = await interview_manager.switch_interviewer()
+                response = await interview_manager.switch_interviewer(db)
                 
                 if response:
                     # 广播新面试官消息
@@ -412,7 +456,7 @@ async def websocket_endpoint(websocket: WebSocket, interview_id: int, db: Sessio
             
             elif msg_data["type"] == "end_interview":
                 # 结束面试
-                await interview_manager.end_interview()
+                await interview_manager.end_interview(db)
                 
                 # 通知所有连接
                 for conn in active_connections.get(interview_id, []):

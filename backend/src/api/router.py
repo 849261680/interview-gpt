@@ -9,8 +9,7 @@ from .endpoints import real_mcp_speech  # 添加真实 MCP 语音端点
 
 # 导入 DeepSeek API 路由
 from .deepseek import router as deepseek_router
-# 暂时禁用WebSocket功能
-# from .endpoints import websocket_routes
+from .endpoints import websocket_routes
 
 # 导入语音处理端点
 from .endpoints.speech import router as speech_router
@@ -19,6 +18,9 @@ from .endpoints.true_mcp_speech import router as true_mcp_speech_router
 
 # 导入新的语音API
 from .speech import router as new_speech_router
+
+# 导入MiniMax TTS API
+from .minimax_tts import router as minimax_tts_router
 
 # 创建主路由
 api_router = APIRouter()
@@ -53,9 +55,11 @@ api_router.include_router(true_mcp_speech_router)
 # 新的MiniMax MCP语音API路由
 api_router.include_router(new_speech_router, tags=["minimax_mcp_speech"])
 
+# MiniMax TTS API路由
+api_router.include_router(minimax_tts_router, tags=["minimax_tts"])
+
 # DeepSeek API路由 - 直接完整路径路由方式
 api_router.include_router(deepseek_router, tags=["deepseek"], prefix="/deepseek")
 
-# 暂时禁用WebSocket路由
 # 注册WebSocket路由 - 不需要前缀，因为WebSocket路由已包含完整路径
-# api_router.include_router(websocket_routes.router, tags=["websocket"])
+api_router.include_router(websocket_routes.router, tags=["websocket"])

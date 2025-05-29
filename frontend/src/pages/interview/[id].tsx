@@ -23,6 +23,7 @@ import {
 
 // 面试服务导入
 import interviewService, { Message as InterviewMessage } from '../../services/InterviewService';
+import InterviewSocketService from '../../services/InterviewSocketService';
 
 /**
  * 面试进行页面 - 集成MiniMax MCP实时AI语音面试
@@ -34,12 +35,12 @@ export default function InterviewSession() {
   const interviewId = id ? parseInt(id as string) : 0;
   
   // 面试官类型定义
-  type InterviewerType = 'technical' | 'hr' | 'product' | 'final';
+  type InterviewerType = 'coordinator' | 'technical' | 'hr' | 'product' | 'product_manager' | 'behavioral' | 'final';
 
   // 基础状态管理
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
-  const [currentInterviewer, setCurrentInterviewer] = useState<InterviewerType>('technical');
+  const [currentInterviewer, setCurrentInterviewer] = useState<InterviewerType>('coordinator');
   const [isLoading, setIsLoading] = useState(false);
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [interviewEnded, setInterviewEnded] = useState(false);
@@ -59,6 +60,11 @@ export default function InterviewSession() {
   const [streamingResponse, setStreamingResponse] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   
+  // WebSocket状态
+  const [socketService, setSocketService] = useState<any>(null);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [wsError, setWsError] = useState<string | null>(null);
+  
   // 语音相关引用
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -69,7 +75,24 @@ export default function InterviewSession() {
   const conversationHistoryRef = useRef<ChatMessage[]>([]);
 
   // 面试官数据
-  const interviewers = {
+  const interviewers: Record<InterviewerType, {
+    id: string;
+    name: string;
+    role: string;
+    avatar: string;
+    description: string;
+    color: string;
+    voice: string;
+  }> = {
+    coordinator: {
+      id: 'coordinator',
+      name: '赵老师',
+      role: '面试协调员',
+      avatar: '🧑‍💼',
+      description: '专业面试协调员，负责协调整个面试流程',
+      color: '#14b8a6',
+      voice: 'female-tianmei'
+    },
     technical: {
       id: 'technical',
       name: '李工',
@@ -77,7 +100,7 @@ export default function InterviewSession() {
       avatar: '👨‍💻',
       description: '资深技术专家，关注技术深度和解决问题能力',
       color: '#3b82f6',
-      voice: 'male-qingsong'
+      voice: 'male-qn-qingse'
     },
     hr: {
       id: 'hr',
@@ -86,7 +109,7 @@ export default function InterviewSession() {
       avatar: '👩‍💼',
       description: '人力资源总监，关注职业规划和公司文化匹配度',
       color: '#10b981',
-      voice: 'female-zhiyu'
+      voice: 'female-shaonv'
     },
     product: {
       id: 'product',
@@ -97,6 +120,24 @@ export default function InterviewSession() {
       color: '#8b5cf6',
       voice: 'male-chunhou'
     },
+    product_manager: {
+      id: 'product_manager',
+      name: '陈经理',
+      role: '产品经理',
+      avatar: '🧩',
+      description: '资深产品总监，关注产品思维和用户视角',
+      color: '#fb923c',
+      voice: 'male-chunhou'
+    },
+    behavioral: {
+      id: 'behavioral',
+      name: '刘老师',
+      role: '行为面试官',
+      avatar: '👨‍🏫',
+      description: '专业行为面试官，评估候选人的软技能和行为模式',
+      color: '#9333ea',
+      voice: 'female-yujie'
+    },
     final: {
       id: 'final',
       name: '张总',
@@ -104,19 +145,195 @@ export default function InterviewSession() {
       avatar: '👔',
       description: '高级总监，负责最终评估和决策',
       color: '#f59e0b',
-      voice: 'male-chunhou'
+      voice: 'male-qn-jingying'
     }
   };
 
-  // 初始化MiniMax MCP服务
+  // 初始化WebSocket连接
+  const initializeWebSocket = async () => {
+    try {
+      // 使用默认导出的单例实例
+      const service = InterviewSocketService;
+      
+      // 添加事件监听
+      service.on('connected', () => {
+        console.log('WebSocket连接成功，使用CrewAI进行面试');
+        setWsConnected(true);
+        setWsError(null);
+      });
+      
+      service.on('message', (data: any) => {
+        console.log('收到WebSocket消息:', data);
+        
+        // 处理不同类型的WebSocket消息
+        if (data.type === 'message' && data.data) {
+          // 处理用户消息和AI回复
+          const { user_message, ai_message } = data.data;
+          
+          // 添加用户消息（如果存在且不是当前用户发送的）
+          if (user_message && user_message.sender_type === 'user') {
+            const userMsg = {
+              id: user_message.id || Date.now(),
+              content: user_message.content,
+              sender: 'user',
+              timestamp: user_message.timestamp || new Date().toISOString()
+            };
+            
+            setMessages(prev => {
+              // 检查是否已经存在相同的消息，避免重复添加
+              const exists = prev.some(msg => msg.id === userMsg.id || 
+                (msg.content === userMsg.content && msg.sender === 'user' && 
+                 Math.abs(new Date(msg.timestamp).getTime() - new Date(userMsg.timestamp).getTime()) < 1000));
+              
+              if (!exists) {
+                return [...prev, userMsg];
+              }
+              return prev;
+            });
+          }
+          
+          // 处理AI回复消息
+          if (ai_message && ai_message.sender_type === 'interviewer') {
+            const aiMsg = {
+              id: ai_message.id || Date.now() + 1,
+              content: ai_message.content,
+              sender: 'interviewer',
+              interviewer: ai_message.interviewer_id || currentInterviewer,
+              timestamp: ai_message.timestamp || new Date().toISOString()
+            };
+            
+            // 更新消息列表
+            setMessages(prev => [...prev, aiMsg]);
+            
+            // 更新当前面试官（如果消息中包含面试官切换信息）
+            if (ai_message.interviewer_id && ai_message.interviewer_id !== currentInterviewer) {
+              setCurrentInterviewer(ai_message.interviewer_id as InterviewerType);
+            }
+            
+            // 添加到对话历史
+            conversationHistoryRef.current.push({
+              role: 'assistant',
+              content: ai_message.content
+            });
+            
+            // 如果启用了语音，播放回复
+            if (voiceEnabled && !isPlaying) {
+              speakText(ai_message.content);
+            }
+            
+            // 如果是面试结束消息
+            if (ai_message.is_final) {
+              setInterviewEnded(true);
+            }
+          }
+          
+          // 结束加载状态
+          setIsLoading(false);
+        }
+        else if (data.type === 'history' && data.data && data.data.messages) {
+          // 处理历史消息
+          console.log('[DEBUG] 收到历史消息:', data.data.messages);
+          const historyMessages = data.data.messages.map((msg: any) => ({
+            id: msg.id || Date.now() + Math.random(),
+            content: msg.content,
+            sender: msg.sender_type === 'user' ? 'user' : 'interviewer',
+            interviewer: msg.interviewer_id || 'coordinator',
+            timestamp: msg.timestamp || new Date().toISOString()
+          }));
+          
+          setMessages(historyMessages);
+          
+          // 更新对话历史
+          conversationHistoryRef.current = historyMessages.map((msg: any) => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.content
+          }));
+        }
+        else if (data.type === 'status' && data.data) {
+          // 处理面试状态消息
+          console.log('[DEBUG] 收到状态消息:', data.data);
+          if (data.data.status === 'active') {
+            setInterviewStarted(true);
+          } else if (data.data.status === 'completed') {
+            setInterviewEnded(true);
+          }
+        }
+        else if (data.type === 'error' && data.data) {
+          // 处理错误消息
+          console.error('[DEBUG] 收到错误消息:', data.data);
+          setWsError(data.data.message || '未知错误');
+          setIsLoading(false);
+          
+          // 显示错误消息
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            content: `系统错误: ${data.data.message}`,
+            sender: 'system',
+            timestamp: new Date().toISOString(),
+            isError: true
+          }]);
+        }
+        else {
+          // 处理其他类型的消息（兼容旧格式）
+          if (data.message) {
+            const message = {
+              id: Date.now(),
+              content: data.message.content || data.message,
+              sender: data.message.interviewer_id || 'coordinator',
+              timestamp: new Date().toISOString()
+            };
+            
+            setMessages(prev => [...prev, message]);
+            setIsLoading(false);
+            
+            if (voiceEnabled && !isPlaying) {
+              speakText(message.content);
+            }
+          }
+        }
+      });
+      
+      service.on('error', (error: any) => {
+        console.error('WebSocket错误:', error);
+        setWsError(error.message || '连接错误');
+        setWsConnected(false);
+      });
+      
+      service.on('close', () => {
+        console.log('WebSocket连接关闭');
+        setWsConnected(false);
+      });
+      
+      // 连接到WebSocket
+      service.connect(interviewId);
+      // 保存服务实例到状态
+      setSocketService(service);
+      
+      return service;
+    } catch (error) {
+      console.error('初始化WebSocket服务失败:', error);
+      setWsError('初始化WebSocket服务失败');
+      return null;
+    }
+  };
+
+  // 初始化面试环境
   useEffect(() => {
+    if (!interviewId) return;
+    
+    // 初始化服务
     initializeMinimaxMCP();
     initializeVoiceFeatures();
+    initializeWebSocket(); // 添加WebSocket初始化
     
     return () => {
+      // 清理资源
       cleanup();
+      if (socketService) {
+        socketService.disconnect();
+      }
     };
-  }, []);
+  }, [interviewId]);
 
   // 初始化MiniMax MCP
   const initializeMinimaxMCP = async () => {
@@ -129,6 +346,7 @@ export default function InterviewSession() {
 
       // 获取配置
       const config = getMinimaxConfig();
+      console.log('[MiniMax] 获取配置:', { ...config, apiKey: config.apiKey ? '***已配置***' : '未配置' });
       
       // 验证配置
       if (!validateConfig(config)) {
@@ -137,18 +355,29 @@ export default function InterviewSession() {
         return;
       }
 
+      console.log('[MiniMax] 配置验证通过，开始创建服务实例');
+
       // 创建服务实例
       const service = createMinimaxService(config);
       
       if (service) {
+        console.log('[MiniMax] 服务实例创建成功，开始初始化');
         await service.initialize();
+        
+        const connected = service.isConnectedToMCP();
+        console.log('[MiniMax] 初始化完成，连接状态:', connected);
+        
         setMinimaxService(service);
-        setMcpConnected(service.isConnectedToMCP());
+        setMcpConnected(connected);
         console.log('MiniMax MCP服务初始化成功');
+      } else {
+        console.error('[MiniMax] 服务实例创建失败');
+        setMcpError('服务实例创建失败');
       }
     } catch (error) {
       console.error('MiniMax MCP初始化失败:', error);
-      setMcpError(`初始化失败: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setMcpError(`初始化失败: ${errorMessage}`);
     }
   };
 
@@ -228,64 +457,195 @@ export default function InterviewSession() {
     }
   };
 
-  // 语音合成 - 使用MiniMax TTS或浏览器内置TTS
+  // 语音合成 - 优先使用浏览器TTS，避免后端配置问题
   const speakText = async (text: string) => {
     if (!voiceEnabled || !text) return;
     
     try {
       setIsPlaying(true);
       
-      // 停止当前播放
+      // 停止当前播放和浏览器TTS
       if (currentAudioRef.current) {
         currentAudioRef.current.pause();
         currentAudioRef.current = null;
       }
       
+      // 停止浏览器TTS以避免冲突
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      
+      // 优先使用MiniMax TTS
+      console.log('[TTS] 检查MiniMax服务状态:', {
+        minimaxService: !!minimaxService,
+        mcpConnected: mcpConnected,
+        voiceEnabled: voiceEnabled
+      });
+      
       if (minimaxService && mcpConnected) {
-        // 使用MiniMax TTS
-        const voice = getInterviewerVoice(currentInterviewer);
-        const ttsResult = await minimaxService.textToSpeech(text, voice, ttsConfig);
-        
-        // 播放音频
-        await minimaxService.playTTSAudio(ttsResult.audioUrl);
-      } else {
-        // 降级到浏览器TTS
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.lang = 'zh-CN';
-        
-        // 尝试匹配声音
-        const voices = window.speechSynthesis.getVoices();
-        const chineseVoice = voices.find(voice => voice.lang.includes('zh'));
-        if (chineseVoice) {
-          utterance.voice = chineseVoice;
+        try {
+          console.log('[TTS] 使用MiniMax MCP进行语音合成');
+          
+          // 使用MiniMax TTS
+          const voice = getInterviewerVoice(currentInterviewer);
+          console.log('[TTS] 当前面试官:', currentInterviewer, '使用语音:', voice);
+          
+          const ttsResult = await minimaxService.textToSpeech(text, voice, ttsConfig);
+          
+          // 验证音频URL
+          if (!ttsResult.audioUrl) {
+            throw new Error('TTS服务未返回有效的音频URL');
+          }
+          
+          console.log('[TTS] MiniMax TTS成功，音频URL:', ttsResult.audioUrl);
+          
+          // 创建音频元素并播放
+          const audio = new Audio();
+          currentAudioRef.current = audio;
+          
+          // 设置事件监听器
+          audio.onended = () => {
+            console.log('[TTS] MiniMax音频播放完成');
+            setIsPlaying(false);
+            currentAudioRef.current = null;
+          };
+          
+          audio.onerror = (error) => {
+            console.error('MiniMax音频播放失败:', error);
+            setIsPlaying(false);
+            currentAudioRef.current = null;
+            
+            // 降级到浏览器TTS
+            console.log('[TTS] 降级到浏览器TTS');
+            fallbackToSpeechSynthesis(text);
+          };
+          
+          audio.onloadstart = () => {
+            console.log('[TTS] 开始加载MiniMax音频');
+          };
+          
+          audio.oncanplay = () => {
+            console.log('[TTS] MiniMax音频可以播放');
+          };
+          
+          audio.onloadeddata = () => {
+            console.log('[TTS] MiniMax音频数据加载完成');
+          };
+          
+          // 设置音频源并播放
+          audio.src = ttsResult.audioUrl;
+          audio.load(); // 强制重新加载
+          
+          // 播放音频
+          try {
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+              await playPromise;
+              console.log('[TTS] MiniMax音频开始播放');
+            }
+          } catch (playError) {
+            console.error('MiniMax音频播放启动失败:', playError);
+            setIsPlaying(false);
+            currentAudioRef.current = null;
+            
+            // 降级到浏览器TTS
+            console.log('[TTS] 播放失败，降级到浏览器TTS');
+            fallbackToSpeechSynthesis(text);
+          }
+        } catch (ttsError) {
+          console.error('MiniMax TTS服务失败:', ttsError);
+          setIsPlaying(false);
+          
+          // 降级到浏览器TTS
+          console.log('[TTS] TTS服务失败，降级到浏览器TTS');
+          fallbackToSpeechSynthesis(text);
         }
-        
-        // 设置事件处理器
-        utterance.onend = () => {
-          setIsPlaying(false);
-        };
-        
-        utterance.onerror = () => {
-          console.error('语音合成出错');
-          setIsPlaying(false);
-        };
-        
-        window.speechSynthesis.speak(utterance);
+      } else {
+        // 直接使用浏览器TTS
+        console.log('[TTS] MiniMax不可用，使用浏览器TTS');
+        fallbackToSpeechSynthesis(text);
       }
     } catch (error) {
       console.error('语音合成失败:', error);
+      setIsPlaying(false);
+      
+      // 降级到浏览器TTS
+      console.log('[TTS] 语音合成失败，降级到浏览器TTS');
+      fallbackToSpeechSynthesis(text);
+    }
+  };
+
+  // 降级到浏览器内置TTS
+  const fallbackToSpeechSynthesis = (text: string) => {
+    try {
+      // 确保停止当前的语音合成
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      
+      // 等待一小段时间确保cancel完成
+      setTimeout(() => {
+        try {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.lang = 'zh-CN';
+          
+          // 尝试匹配中文声音
+          const voices = window.speechSynthesis.getVoices();
+          const chineseVoice = voices.find(voice => 
+            voice.lang.includes('zh') || voice.lang.includes('Chinese')
+          );
+          if (chineseVoice) {
+            utterance.voice = chineseVoice;
+            console.log('[TTS] 使用中文语音:', chineseVoice.name);
+          }
+          
+          // 设置事件处理器
+          utterance.onend = () => {
+            console.log('[TTS] 浏览器TTS播放完成');
+            setIsPlaying(false);
+          };
+          
+          utterance.onerror = (error) => {
+            console.error('浏览器TTS出错:', error);
+            setIsPlaying(false);
+            
+            // 如果是interrupted错误，可能是正常的停止操作
+            if (error.error === 'interrupted') {
+              console.log('[TTS] 浏览器TTS被中断（可能是正常停止）');
+            }
+          };
+          
+          utterance.onstart = () => {
+            console.log('[TTS] 浏览器TTS开始播放');
+          };
+          
+          // 开始语音合成
+          window.speechSynthesis.speak(utterance);
+        } catch (synthError) {
+          console.error('浏览器TTS启动失败:', synthError);
+          setIsPlaying(false);
+        }
+      }, 100); // 100ms延迟确保cancel完成
+      
+    } catch (error) {
+      console.error('浏览器TTS失败:', error);
       setIsPlaying(false);
     }
   };
 
   // 停止语音播放
   const stopSpeaking = () => {
-    if (minimaxService && currentAudioRef.current) {
+    // 停止MiniMax音频播放
+    if (currentAudioRef.current) {
       currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
       currentAudioRef.current = null;
-    } else {
+    }
+    
+    // 停止浏览器TTS
+    if (window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
     
@@ -453,9 +813,10 @@ export default function InterviewSession() {
         
         // 如果是对话开始，添加系统提示
         if (conversationHistoryRef.current.length === 0) {
+          const interviewerPrompt = getInterviewerPrompt(currentInterviewer);
           const systemMessage: InterviewMessage = {
             role: 'system',
-            content: getInterviewerPrompt(currentInterviewer)
+            content: interviewerPrompt.systemPrompt
           };
           conversationHistoryRef.current.push(systemMessage);
         }
@@ -525,8 +886,6 @@ export default function InterviewSession() {
       }]);
     }
   };
-
-
 
   // 格式化录音时间
   const formatRecordingTime = (seconds: number) => {
@@ -598,10 +957,13 @@ export default function InterviewSession() {
     }, 1500);
   };
 
-  // 发送消息
-  const handleSendMessage = async () => {
+  // 处理用户消息提交
+  const handleSubmit = async () => {
     if (!inputValue.trim() || isLoading) return;
     
+    setIsLoading(true);
+    
+    // 添加用户消息到列表
     const userMessage = {
       id: Date.now(),
       content: inputValue,
@@ -611,62 +973,66 @@ export default function InterviewSession() {
     
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
-    setIsLoading(true);
+    
+    // 添加到对话历史
+    conversationHistoryRef.current.push({
+      role: 'user',
+      content: inputValue
+    });
     
     try {
-      // 更新对话历史
-      const newUserMessage: InterviewMessage = {
-        role: 'user',
-        content: inputValue
-      };
-      
-      // 如果是对话开始，添加系统提示
-      if (conversationHistoryRef.current.length === 0) {
-        const systemMessage: InterviewMessage = {
-          role: 'system',
-          content: getInterviewerPrompt(currentInterviewer)
-        };
-        conversationHistoryRef.current.push(systemMessage);
-      }
-      
-      // 添加用户消息到对话历史
-      conversationHistoryRef.current.push(newUserMessage);
-      
-      // 使用面试服务获取AI回复 - 默认使用DeepSeek，如果需要MiniMax则将其传入
-      const response = await interviewService.getAIResponse(
-        conversationHistoryRef.current as InterviewMessage[], 
-        minimaxService
-      );
-      
-      if (response.success) {
-        // 添加AI回复到对话历史
-        conversationHistoryRef.current.push({
-          role: 'assistant',
-          content: response.content
-        });
+      // 优先使用WebSocket连接，如果可用
+      if (socketService && wsConnected) {
+        console.log('使用WebSocket发送消息到CrewAI后端...');
         
-        // 添加AI回复到UI显示
-        setMessages(prev => [...prev, {
-          id: Date.now(),
-          content: response.content,
-          sender: currentInterviewer,
-          timestamp: new Date().toISOString()
-        }]);
+        // 通过WebSocket发送消息
+        socketService.sendMessage(inputValue);
         
-        // 如果语音功能启用，用语音读出回复
-        if (voiceEnabled && !isPlaying) {
-          await speakText(response.content);
-        }
+        // 注意：这里不需要设置加载状态为false，
+        // 因为我们将会等待WebSocket的回复消息
       } else {
-        // 处理错误情况
-        setMessages(prev => [...prev, {
-          id: Date.now(),
-          content: '抱歉，面试系统暂时无法响应。请稍后再试。',
-          sender: currentInterviewer,
-          timestamp: new Date().toISOString(),
-          isError: true
-        }]);
-        console.error('获取AI回复失败:', response.error);
+        console.log('WebSocket不可用，使用API调用...');
+        // 如果WebSocket不可用，则回退到原来的API调用方式
+        
+        // 使用面试服务获取AI回复
+        const response = await interviewService.getAIResponse(
+          conversationHistoryRef.current as InterviewMessage[],
+          minimaxService
+        );
+        
+        if (response.success) {
+          // 添加AI回复到对话历史
+          conversationHistoryRef.current.push({
+            role: 'assistant',
+            content: response.content
+          });
+          
+          // 添加AI回复到UI显示
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            content: response.content,
+            sender: currentInterviewer,
+            timestamp: new Date().toISOString()
+          }]);
+          
+          // 如果语音功能启用，用语音读出回复
+          if (voiceEnabled && !isPlaying) {
+            await speakText(response.content);
+          }
+        } else {
+          // 处理错误情况
+          setMessages(prev => [...prev, {
+            id: Date.now(),
+            content: '抱歉，面试系统暂时无法响应。请稍后再试。',
+            sender: currentInterviewer,
+            timestamp: new Date().toISOString(),
+            isError: true
+          }]);
+          console.error('获取AI回复失败:', response.error);
+        }
+        
+        // 完成加载
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('处理消息时出错:', error);
@@ -677,19 +1043,20 @@ export default function InterviewSession() {
         timestamp: new Date().toISOString(),
         isError: true
       }]);
-    } finally {
-      setIsLoading(false);
       
-      // 滚动到最新消息
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
+      // 出错时结束加载状态
+      setIsLoading(false);
+    }
+    
+    // 滚动到最新消息
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   // 切换面试官
   const switchInterviewer = () => {
-    const stages = ['technical', 'hr', 'product', 'final'];
+    const stages: InterviewerType[] = ['coordinator', 'technical', 'product_manager', 'behavioral', 'hr', 'final'];
     const currentIndex = stages.indexOf(currentInterviewer);
     const nextIndex = (currentIndex + 1) % stages.length;
     const nextStage = stages[nextIndex];
@@ -703,10 +1070,11 @@ export default function InterviewSession() {
       timestamp: new Date().toISOString()
     };
     
-    const newInterviewerPrompt = getInterviewerPrompt(nextStage);
+    // 使用正确的类型处理interviewPrompts返回结果
+    const newInterviewerPrompt = getInterviewerPrompt(nextStage as string);
     const newInterviewerMessage = {
       id: Date.now() + 1,
-      content: newInterviewerPrompt.welcomeMessage,
+      content: typeof newInterviewerPrompt === 'string' ? newInterviewerPrompt : newInterviewerPrompt.welcomeMessage,
       sender: 'interviewer',
       interviewer: nextStage,
       timestamp: new Date().toISOString()
@@ -744,7 +1112,7 @@ export default function InterviewSession() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSubmit();
     }
   };
 
@@ -954,7 +1322,10 @@ export default function InterviewSession() {
           }}>
             <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem' }}>面试进度</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {Object.entries(interviewers).map(([key, interviewer]) => (
+              {Object.entries(interviewers)
+                // 过滤掉product角色，仅保留product_manager作为产品经理
+                .filter(([key]) => key !== 'product')
+                .map(([key, interviewer]) => (
                 <div key={key} style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1122,7 +1493,7 @@ export default function InterviewSession() {
                       position: 'relative'
                     }}>
                       {/* 面试官信息 */}
-                      {message.sender === 'interviewer' && (
+                      {(message.sender === 'interviewer' || (message.sender !== 'user' && message.sender !== 'system')) && (
                         <div style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -1136,8 +1507,18 @@ export default function InterviewSession() {
                             fontSize: '0.875rem',
                             color: 'rgba(255, 255, 255, 0.8)'
                           }}>
-                            <span>{interviewers[message.interviewer]?.avatar}</span>
-                            <span>{interviewers[message.interviewer]?.name}</span>
+                            <span>{message.interviewer 
+                              ? (interviewers[message.interviewer as InterviewerType] || interviewers.technical).avatar
+                              : (interviewers[message.sender as InterviewerType] 
+                                  ? interviewers[message.sender as InterviewerType].avatar
+                                  : interviewers.coordinator.avatar)
+                            }</span>
+                            <span>{message.interviewer 
+                              ? `${(interviewers[message.interviewer as InterviewerType] || interviewers.technical).name}（${(interviewers[message.interviewer as InterviewerType] || interviewers.technical).role}）`
+                              : (interviewers[message.sender as InterviewerType] 
+                                  ? `${interviewers[message.sender as InterviewerType].name}（${interviewers[message.sender as InterviewerType].role}）`
+                                  : `${interviewers.coordinator.name}（${interviewers.coordinator.role}）`)
+                            }</span>
                             <span style={{
                               fontSize: '0.625rem',
                               background: 'rgba(16, 185, 129, 0.2)',
@@ -1453,7 +1834,7 @@ export default function InterviewSession() {
 
                 {/* 文字发送按钮 */}
                 <button
-                  onClick={handleSendMessage}
+                  onClick={handleSubmit}
                   disabled={!inputValue.trim() || isLoading || isRecording || isStreaming}
                   style={{
                     background: (!inputValue.trim() || isLoading || isRecording || isStreaming) 

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from ...models.schemas import Interview, Message
 from ...services.interview_service import get_interview_service, send_message_service
+from ...services.interview.interview_manager import InterviewManager, get_or_create_interview_manager
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,10 @@ class ConnectionManager:
     def __init__(self):
         # 活跃连接: {interview_id: {client_id: websocket}}
         self.active_connections: Dict[int, Dict[str, WebSocket]] = {}
-        # 面试会话状态: {interview_id: interview_state}
+        # 面试会话状态: {interview_id: interview_state} - Potentially redundant if manager holds all state
         self.interview_states: Dict[int, Dict[str, Any]] = {}
+        # 面试管理器实例: {interview_id: InterviewManager instance}
+        self.interview_managers: Dict[int, InterviewManager] = {} # Added initialization
     
     async def connect(self, websocket: WebSocket, interview_id: int, client_id: str, db: Session) -> None:
         """
@@ -32,50 +35,86 @@ class ConnectionManager:
             client_id: 客户端ID
             db: 数据库会话
         """
-        await websocket.accept()
-        
-        # 初始化面试连接字典
-        if interview_id not in self.active_connections:
-            self.active_connections[interview_id] = {}
-        
-        # 保存连接
-        self.active_connections[interview_id][client_id] = websocket
-        
-        # 创建面试管理器（如果不存在）
-        if interview_id not in self.interview_states:
-            # 初始化面试状态
-            self.interview_states[interview_id] = {
-                "interview_id": interview_id,
-                "active": True,
-                "current_stage": "technical",  # 当前面试阶段（技术面试、HR面试等）
-                "last_message_time": None
-            }
-        
-        # 获取面试历史消息
-        history = await self.get_history(interview_id, db)
-        
-        # 发送历史消息
-        await self.send_personal_message(
-            {
-                "type": "history",
-                "data": {
-                    "messages": history
+        logger.info(f"[Connect START] 尝试连接客户端 interview_id: {interview_id}, client_id: {client_id}")
+        logger.info(f"[Connect START] Attempting to connect client {client_id} to interview {interview_id}") # 新日志
+        try:
+            logger.info(f"[Connect] About to accept websocket for interview {interview_id}, client {client_id}") # 新日志
+            await websocket.accept()
+            logger.info(f"[Connect] Websocket accepted for interview {interview_id}, client {client_id}") # 新日志
+            
+            # 初始化面试连接字典
+            if interview_id not in self.active_connections:
+                logger.info(f"[Connect] Initializing active_connections for new interview_id {interview_id}") # 新日志
+                self.active_connections[interview_id] = {}
+            
+            # 保存连接
+            self.active_connections[interview_id][client_id] = websocket
+            logger.info(f"[Connect] Websocket for client {client_id} stored for interview {interview_id}") # 新日志
+            
+            # 获取或创建面试管理器并初始化 (核心修改)
+            logger.info(f"[Connect] Checking for existing InterviewManager for interview {interview_id}") # 新日志
+            manager = self.interview_managers.get(interview_id)
+            logger.info(f"[Connect] Result of get manager for interview {interview_id}: {'Exists' if manager else 'None'}") # 新日志
+            if not manager:
+                logger.info(f"[Connect] No existing InterviewManager for interview {interview_id}. Creating and initializing.")
+                manager = InterviewManager(interview_id=interview_id, db=db)
+                await manager.initialize_interview() # Initialize for new interview
+                self.interview_managers[interview_id] = manager
+                logger.info(f"[Connect] New InterviewManager created and initialized for interview {interview_id}") # 新日志
+            else:
+                logger.info(f"[Connect] Found existing InterviewManager for interview {interview_id}.")
+
+            # 创建面试状态字典（如果不存在） - 这部分可能需要重新评估其必要性
+            if interview_id not in self.interview_states: # This might be redundant now
+                self.interview_states[interview_id] = {
+                    "interview_id": interview_id,
+                    "active": True,
+                    "current_stage": "introduction",  # 当前面试阶段（介绍阶段，由面试协调员负责）
+                    "last_message_time": None
                 }
-            },
-            websocket
-        )
-        
-        # 发送当前面试状态
-        status = self.interview_managers[interview_id].get_interview_status()
-        await self.send_personal_message(
-            {
-                "type": "status",
-                "data": status
-            },
-            websocket
-        )
-        
-        logger.info(f"客户端 {client_id} 已连接到面试 {interview_id}")
+            
+            # 获取面试历史消息
+            history = await self.get_history(interview_id, db)
+            
+            # 发送历史消息
+            await self.send_personal_message(
+                {
+                    "type": "history",
+                    "data": {
+                        "messages": history
+                    }
+                },
+                websocket
+            )
+            
+            # 发送当前面试状态 (现在 manager 应该总是存在且已初始化)
+            if manager: # 确保 manager 存在
+                status = manager.get_interview_status()
+                await self.send_personal_message(
+                    {
+                        "type": "status",
+                        "data": status
+                    },
+                    websocket
+                )
+                logger.info(f"[Connect] Sent status to client {client_id} for interview {interview_id}") # 新日志
+            else:
+                logger.error(f"[Connect] Manager is None for interview {interview_id}, cannot send status.") # 新日志
+            
+            logger.info(f"客户端 {client_id} 已连接到面试 {interview_id}")
+            logger.info(f"[Connect END] Client {client_id} successfully connected to interview {interview_id}") # 新日志
+        except Exception as e:
+            logger.error(f"[Connect ERROR] Exception during connect for interview {interview_id}, client {client_id}: {e}", exc_info=True) # 新日志，记录异常信息
+            # 尝试安全地关闭websocket或进行其他清理
+            try:
+                await websocket.close()
+            except: # noqa
+                pass # 忽略关闭时的错误
+            # 从活动连接中移除，以防部分添加
+            if interview_id in self.active_connections and client_id in self.active_connections[interview_id]:
+                del self.active_connections[interview_id][client_id]
+                if not self.active_connections[interview_id]:
+                    del self.active_connections[interview_id]
     
     def disconnect(self, interview_id: int, client_id: str) -> None:
         """
@@ -170,20 +209,22 @@ class ConnectionManager:
         Returns:
             处理结果
         """
-        if interview_id not in self.interview_managers:
-            return {
-                "type": "error",
-                "data": {
-                    "message": "面试不存在或已结束"
-                }
-            }
+        # 获取或创建面试管理器
+        manager = self.interview_managers.get(interview_id)
+        if not manager:
+            # This case should ideally not happen if connect logic is correct,
+            # but as a fallback:
+            logger.warning(f"InterviewManager for {interview_id} not found in process_message, creating.")
+            manager = InterviewManager(interview_id=interview_id, db=db)
+            await manager.initialize_interview() # Ensure initialization
+            self.interview_managers[interview_id] = manager
         
-        manager = self.interview_managers[interview_id]
-        message_type = data.get("type", "")
+        message_type = data.get("type")
+        payload = data.get("payload", {})
         
         if message_type == "message":
             # 处理用户消息
-            content = data.get("content", "").strip()
+            content = payload.get("content", "").strip()
             if not content:
                 return {
                     "type": "error",
@@ -263,6 +304,30 @@ class ConnectionManager:
                 }
             }
         
+        elif message_type == "get_status":
+            # 获取当前面试状态和面试官信息
+            current_stage = manager.current_stage
+            
+            # 根据当前阶段从 INTERVIEW_STAGES 中获取面试官 ID
+            from ...services.interview.interview_manager import INTERVIEW_STAGES # Keep local import if INTERVIEW_STAGES is not global
+            current_interviewer_id = INTERVIEW_STAGES[current_stage]['interviewer_id']
+            
+            # 根据面试官 ID 获取面试官名称
+            from ...agents.interviewer_factory import InterviewerFactory # Keep local import if not used elsewhere frequently
+            interviewer_factory = InterviewerFactory()
+            interviewer = interviewer_factory.get_interviewer(current_interviewer_id)
+            interviewer_name = interviewer.name if interviewer else "未知面试官"
+            
+            # 通知前端当前面试官变更
+            return {
+                "type": "interviewer_change",
+                "data": {
+                    "interviewer_id": current_interviewer_id,
+                    "interviewer_name": interviewer_name,
+                    "stage": current_stage
+                }
+            }
+        
         # 未知消息类型
         return {
             "type": "error",
@@ -274,14 +339,9 @@ class ConnectionManager:
 # 创建全局连接管理器实例
 connection_manager = ConnectionManager()
 
-async def handle_websocket(
-    websocket: WebSocket, 
-    interview_id: int, 
-    client_id: str, 
-    db: Session
-) -> None:
+async def handle_websocket(websocket: WebSocket, interview_id: int, client_id: str, db: Session):
     """
-    处理WebSocket连接
+    处理WebSocket连接和实时通信
     
     Args:
         websocket: WebSocket连接
@@ -289,8 +349,11 @@ async def handle_websocket(
         client_id: 客户端ID
         db: 数据库会话
     """
-    # 连接WebSocket
+    logger.info(f"[WebSocket] ===开始尝试建立WebSocket连接=== interview_id: {interview_id}, client_id: {client_id}")
+    # 连接到WebSocket
+    logger.info(f"[WebSocket] 正在调用connection_manager.connect()方法 interview_id: {interview_id}")
     await connection_manager.connect(websocket, interview_id, client_id, db)
+    logger.info(f"[WebSocket] connection_manager.connect()方法执行完成 interview_id: {interview_id}")
     
     try:
         # 持续接收消息

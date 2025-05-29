@@ -103,10 +103,10 @@ class MinimaxMCPService {
         throw new Error('MiniMax API Key 和 Group ID 是必需的');
       }
 
-      // 建立WebSocket连接用于实时通信
-      await this.connectWebSocket();
+      // 对于TTS功能，我们不需要WebSocket连接，直接设置为已连接
+      this.isConnected = true;
       
-      console.log('MiniMax MCP 服务初始化成功');
+      console.log('MiniMax MCP 服务初始化成功 - TTS功能可用');
     } catch (error) {
       console.error('MiniMax MCP 初始化失败:', error);
       throw error;
@@ -289,16 +289,28 @@ class MinimaxMCPService {
     try {
       console.log(`[MiniMaxMCP] 开始调用语音合成，文本长度: ${text.length}，语音: ${voice}`);
       
-      // 构建请求体 - 修正为后端期望的格式
+      // 构建请求体 - 使用新的MiniMax TTS API格式
       const requestBody = {
         text,
-        interviewer_type: voice || "system"  // 将voice映射为interviewer_type
+        voice_id: voice || "female-tianmei",
+        service: "minimax",
+        model: "speech-02-hd",
+        speed: config.speed || 1.0,
+        vol: config.volume || 1.0,
+        pitch: config.pitch || 0,
+        emotion: "happy",
+        sample_rate: 32000,
+        bitrate: 128000,
+        channel: 1,
+        format: config.audioFormat || "mp3",
+        language_boost: "auto"
       };
 
-      console.log(`[MiniMaxMCP] 发送请求到后端API: ${this.config.baseUrl}/text-to-speech`);
+      // 使用新的MiniMax TTS API端点
+      const apiUrl = 'http://127.0.0.1:8000/api/api/minimax-tts/synthesize';
+      console.log(`[MiniMaxMCP] 发送请求到新的MiniMax TTS API: ${apiUrl}`);
 
-      // 直接调用后端API，使用完整URL
-      const response = await fetch(`${this.config.baseUrl}/text-to-speech`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -313,51 +325,19 @@ class MinimaxMCPService {
         throw new Error(`TTS请求失败: ${response.status} ${response.statusText}`);
       }
 
-      // 检查响应的Content-Type头来确定返回的数据类型
-      const contentType = response.headers.get('Content-Type') || '';
+      const result = await response.json();
+      console.log(`[MiniMaxMCP] TTS请求成功: ${JSON.stringify(result)}`);
       
-      // 如果是音频文件直接返回
-      if (contentType.includes('audio/')) {
-        console.log(`[MiniMaxMCP] TTS请求成功: 返回了直接的音频文件`);
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        return {
-          audioUrl: audioUrl,
-          duration: 0, // 无法直接获取音频时长
-          format: contentType.includes('mp3') ? 'mp3' : 'wav'
-        };
+      if (!result.success) {
+        console.error(`[MiniMaxMCP] TTS服务返回错误: ${result.error || result.message}`);
+        throw new Error(result.error || result.message || 'TTS服务返回错误');
       }
       
-      // 如果是XML/SSML格式(Speech Synthesis Markup Language)
-      if (contentType.includes('application/xml') || contentType.includes('text/xml') || contentType.includes('text/html')) {
-        console.log(`[MiniMaxMCP] TTS请求返回了XML/SSML格式`);
-        const xmlText = await response.text();
-        
-        // 只能处理SSML的情况下，我们需要告知用户
-        console.warn(`[MiniMaxMCP] 收到SSML格式响应，但无法直接处理。后端应返回JSON或音频文件。`);
-        throw new Error('TTS服务返回了不支持的XML格式数据，请联系后端开发人员修复此问题');
-      }
-      
-      // 默认尝试解析为JSON
-      try {
-        const result = await response.text();
-        const jsonResult = JSON.parse(result);
-        console.log(`[MiniMaxMCP] TTS请求成功: ${JSON.stringify(jsonResult)}`);
-        
-        if (!jsonResult.success) {
-          console.error(`[MiniMaxMCP] TTS服务返回错误: ${jsonResult.error || '未知错误'}`);
-          throw new Error(jsonResult.error || 'TTS服务返回错误');
-        }
-        
-        return {
-          audioUrl: jsonResult.audio_url || '',
-          duration: jsonResult.duration || 0,
-          format: jsonResult.format || 'mp3'
-        };
-      } catch (jsonError) {
-        console.error(`[MiniMaxMCP] 无法解析TTS响应: ${jsonError}`);
-        throw new Error(`无法解析TTS响应: ${jsonError instanceof Error ? jsonError.message : '未知错误'}`);
-      }
+      return {
+        audioUrl: result.audio_url || result.audio_path || '',
+        duration: result.duration || 0,
+        format: result.format || 'mp3'
+      };
     } catch (error) {
       console.error('MiniMax TTS调用失败:', error);
       throw error;

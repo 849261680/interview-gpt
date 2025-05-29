@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 下后端使用 MiniMax Model Context Protocol（MiniMax MCP）的说明文档，适合后端开发者快速上手集成MiniMax MCP的各种AI功能。
 

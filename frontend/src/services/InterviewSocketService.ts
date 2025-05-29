@@ -55,11 +55,17 @@ class InterviewSocketService extends EventEmitter {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const wsUrl = baseUrl.replace(/^http/, 'ws');
-      this.socket = new WebSocket(`${wsUrl}/interview-process/${interviewId}/ws`);
+      
+      // 处理baseUrl中可能已经包含的/api路径
+      const apiPath = wsUrl.endsWith('/api') ? '' : '/api';
+      const wsEndpoint = `${wsUrl}${apiPath}/interview-process/${interviewId}/ws`;
+      
+      console.log(`[DEBUG] 尝试连接WebSocket: ${wsEndpoint}`);
+      this.socket = new WebSocket(wsEndpoint);
       
       // 连接打开
       this.socket.onopen = () => {
-        console.log(`面试WebSocket连接成功: ID=${interviewId}`);
+        console.log(`[DEBUG] 面试WebSocket连接成功: ID=${interviewId}`);
         this.isConnecting = false;
         this.reconnectAttempts = 0;
         this.emit('connected');
@@ -75,15 +81,16 @@ class InterviewSocketService extends EventEmitter {
       this.socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log(`[DEBUG] 收到WebSocket消息:`, data);
           this.handleMessage(data);
         } catch (error) {
-          console.error('解析WebSocket消息失败:', error);
+          console.error('[DEBUG] 解析WebSocket消息失败:', error, '原始消息:', event.data);
         }
       };
       
       // 连接关闭
       this.socket.onclose = () => {
-        console.log(`面试WebSocket连接关闭: ID=${interviewId}`);
+        console.log(`[DEBUG] 面试WebSocket连接关闭: ID=${interviewId}`);
         this.socket = null;
         
         if (this.isConnecting) {
@@ -95,7 +102,7 @@ class InterviewSocketService extends EventEmitter {
       
       // 连接错误
       this.socket.onerror = (error) => {
-        console.error(`面试WebSocket连接错误:`, error);
+        console.error(`[DEBUG] 面试WebSocket连接错误:`, error);
         this.emit('error', error);
       };
       
@@ -156,18 +163,22 @@ class InterviewSocketService extends EventEmitter {
    * @param data 消息数据
    */
   private handleMessage(data: any): void {
+    console.log(`[DEBUG] 处理WebSocket消息:`, data);
     const { type, data: messageData } = data;
     
     switch (type) {
       case 'history':
+        console.log(`[DEBUG] 收到历史消息:`, messageData.messages);
         this.emit('history', messageData.messages);
         break;
         
       case 'message':
+        console.log(`[DEBUG] 收到新消息:`, messageData);
         this.emit('message', messageData);
         break;
         
       case 'status':
+        console.log(`[DEBUG] 收到状态更新:`, messageData);
         this.emit('status', messageData);
         break;
         
@@ -214,6 +225,15 @@ class InterviewSocketService extends EventEmitter {
   public requestEndInterview(): void {
     this.send({
       type: 'end_interview'
+    });
+  }
+  
+  /**
+   * 请求当前面试状态和活跃面试官信息
+   */
+  public requestCurrentStatus(): void {
+    this.send({
+      type: 'get_status'
     });
   }
   

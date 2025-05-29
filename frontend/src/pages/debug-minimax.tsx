@@ -60,7 +60,8 @@ const DebugMinimaxPage: React.FC = () => {
         });
 
       } catch (error) {
-        addLog(`错误: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        addLog(`错误: ${errorMessage}`);
         console.error('调试错误:', error);
       }
     };
