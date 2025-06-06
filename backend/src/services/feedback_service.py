@@ -9,7 +9,8 @@ from datetime import datetime
 
 from ..models.schemas import Feedback, InterviewerFeedback, Interview
 from ..schemas.interview import FeedbackCreate
-from ..agents.interviewer_factory import InterviewerFactory
+# 使用新的CrewAI架构，不再需要InterviewerFactory
+from .ai.crewai_integration import get_crewai_integration
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -40,7 +41,9 @@ async def generate_feedback_service(
         raise ValueError(f"面试不存在: ID={interview_id}")
     
     # 获取所有面试官类型
-    interviewer_sequence = InterviewerFactory.get_interviewer_sequence()
+            # 使用CrewAI获取面试官序列
+        crewai_integration = get_crewai_integration()
+        interviewer_sequence = crewai_integration.get_available_interviewers()
     
     # 从每个面试官获取评估
     interviewer_feedbacks = []
@@ -56,7 +59,8 @@ async def generate_feedback_service(
     for interviewer_id in interviewer_sequence:
         try:
             # 获取面试官实例
-            interviewer = InterviewerFactory.get_interviewer(interviewer_id)
+            # 使用CrewAI进行面试轮次评估
+            # interviewer = InterviewerFactory.get_interviewer(interviewer_id)  # 已删除
             
             # 生成评估
             feedback = await interviewer.generate_feedback(messages)

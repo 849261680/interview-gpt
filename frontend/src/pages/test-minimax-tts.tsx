@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { MinimaxMCPService } from '../services/MinimaxMCPService';
+import { createMinimaxService, type MinimaxConfig } from '../services/MinimaxMCPService';
 
 const TestMinimaxTTS: React.FC = () => {
   const [text, setText] = useState('你好，这是MiniMax TTS测试。欢迎使用AI面试系统！');
@@ -40,10 +40,11 @@ const TestMinimaxTTS: React.FC = () => {
 
     try {
       // 创建MiniMax服务实例
-      const minimaxService = new MinimaxMCPService({
+      const config: MinimaxConfig = {
         apiKey: 'test-key', // 测试用，实际会被后端忽略
         groupId: 'test-group'
-      });
+      };
+      const minimaxService = createMinimaxService(config);
 
       console.log('开始TTS测试...');
       

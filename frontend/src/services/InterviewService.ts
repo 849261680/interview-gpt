@@ -100,11 +100,8 @@ class InterviewService {
         const minimaxMessages = this.toMinimaxMessages(messages);
         const response = await minimaxService.chat(minimaxMessages, chatConfig);
         
-        if (!response.success) {
-          throw new Error(response.error || 'MiniMax APIu8c03u7528u5931u8d25');
-        }
-        
-        const content = response.data?.choices?.[0]?.message?.content || 'u62b1u6b49uff0cu9762u8bd5u7cfbu7edfu6682u65f6u65e0u6cd5u54cdu5e94u3002u8bf7u7a0du540eu518du8bd5u3002';
+        // MiniMax的chat方法直接返回ChatResponse，如果出错会抛出异常
+        const content = response.content || 'u62b1u6b49uff0cu9762u8bd5u7cfbu7edfu6682u65f6u65e0u6cd5u54cdu5e94u3002u8bf7u7a0du540eu518du8bd5u3002';
         return {
           success: true,
           content

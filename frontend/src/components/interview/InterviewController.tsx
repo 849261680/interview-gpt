@@ -80,13 +80,15 @@ const InterviewController: React.FC<InterviewControllerProps> = ({
   // 获取当前阶段描述
   const getStageDescription = (stage: InterviewStage) => {
     switch (stage) {
-      case 'technical':
-        return '技术面试阶段：面试官会评估您的技术知识和解决问题的能力';
-      case 'hr':
+      case 'resume_analysis':
+        return '简历分析阶段：AI正在分析您的简历，为面试做准备';
+      case 'hr_interview':
         return 'HR面试阶段：面试官会评估您的职业规划、文化匹配度和沟通能力';
-      case 'behavioral':
+      case 'technical_interview':
+        return '技术面试阶段：面试官会评估您的技术知识和解决问题的能力';
+      case 'behavioral_interview':
         return '行为面试阶段：面试官会通过您的过往经历评估您的行为模式和团队协作能力';
-      case 'feedback':
+      case 'interview_evaluation':
         return '评估反馈阶段：系统正在生成您的面试评估报告';
       default:
         return '正在进行面试...';
@@ -142,7 +144,7 @@ const InterviewController: React.FC<InterviewControllerProps> = ({
         </div>
         
         <div>
-          {isActive && currentStage !== 'feedback' && (
+          {isActive && currentStage !== 'interview_evaluation' && (
             <Button
               onClick={handleAdvanceStage}
               disabled={!canAdvance || isAdvancing}

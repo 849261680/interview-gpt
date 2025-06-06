@@ -5,7 +5,7 @@
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
 
-export type InterviewStage = 'technical' | 'hr' | 'behavioral' | 'feedback';
+export type InterviewStage = 'resume_analysis' | 'hr_interview' | 'technical_interview' | 'behavioral_interview' | 'interview_evaluation';
 
 export interface InterviewProgressProps {
   /** 当前面试阶段 */
@@ -25,12 +25,13 @@ const InterviewProgress: React.FC<InterviewProgressProps> = ({
   percentComplete = 0,
   className
 }) => {
-  // 面试阶段配置
+  // 面试阶段配置 - 按照新的五阶段顺序
   const stages = [
-    { id: 'technical', name: '技术面试', icon: 'code' },
-    { id: 'hr', name: 'HR面试', icon: 'user' },
-    { id: 'behavioral', name: '行为面试', icon: 'users' },
-    { id: 'feedback', name: '评估反馈', icon: 'clipboard-check' }
+    { id: 'resume_analysis', name: '简历分析师', icon: 'document-text' },
+    { id: 'hr_interview', name: 'HR面试官', icon: 'user' },
+    { id: 'technical_interview', name: '技术面试官', icon: 'code' },
+    { id: 'behavioral_interview', name: '行为面试官', icon: 'users' },
+    { id: 'interview_evaluation', name: '面试评估官', icon: 'clipboard-check' }
   ];
 
   // 获取当前阶段索引
@@ -39,16 +40,22 @@ const InterviewProgress: React.FC<InterviewProgressProps> = ({
   // 获取图标
   const getIcon = (iconName: string) => {
     switch (iconName) {
-      case 'code':
+      case 'document-text':
         return (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
           </svg>
         );
       case 'user':
         return (
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+          </svg>
+        );
+      case 'code':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
           </svg>
         );
       case 'users':

@@ -16,11 +16,8 @@ import aiofiles
 from ..models.schemas import Interview, Message
 from ..models.pydantic_models import InterviewCreate, InterviewResponse, MessageCreate, MessageResponse
 
-# 🔄 使用YAML配置的顺序流程管理器
-from .interview.crewai_yaml_sequential_manager import CrewAIYAMLSequentialManager
-
-# 导入简历解析器
-from .resume_parser import resume_parser
+# 🔄 使用AI集成服务（Flow架构优先）
+from .ai.crewai_integration import get_crewai_integration
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -29,7 +26,8 @@ logger = logging.getLogger(__name__)
 async def create_interview_service(
     interview_data: InterviewCreate,
     resume: Optional[UploadFile] = None,
-    db: Session = None
+    db: Session = None,
+    execute_crewai: bool = True
 ) -> InterviewResponse:
     """
     创建新的面试会话
@@ -38,92 +36,135 @@ async def create_interview_service(
         interview_data: 面试创建数据
         resume: 简历文件（可选）
         db: 数据库会话
+        execute_crewai: 是否立即执行CrewAI流程，默认为True
         
     Returns:
         InterviewResponse: 创建的面试会话数据
     """
-    logger.info(f"创建面试会话服务: {interview_data.position}")
+    logger.info(f"创建面试会话服务: {interview_data.position}, execute_crewai={execute_crewai}")
     
     try:
         # 处理简历文件
-        resume_context = ""
-        resume_path = None
+        resume_content = None
+        resume_filename = None
+        
         if resume:
             logger.info(f"处理简历文件: {resume.filename}")
             
+            # 验证文件类型
+            allowed_types = ['application/pdf', 'application/msword', 
+                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                           'text/plain']
+            
+            if resume.content_type not in allowed_types:
+                raise ValueError(f"不支持的文件类型: {resume.content_type}")
+            
+            # 验证文件大小 (10MB)
+            content = await resume.read()
+            if len(content) > 10 * 1024 * 1024:
+                raise ValueError("文件大小不能超过10MB")
+            
+            # 保存文件
+            upload_dir = "uploads/resumes"
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            file_extension = os.path.splitext(resume.filename)[1]
+            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            file_path = os.path.join(upload_dir, unique_filename)
+            
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(content)
+            
+            resume_filename = unique_filename
+            
+            # 提取简历文本内容（用于CrewAI处理）
             try:
-                # 创建临时文件保存上传的简历
-                with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(resume.filename)[1]) as temp_file:
-                    resume_content = await resume.read()
-                    temp_file.write(resume_content)
-                    temp_file_path = temp_file.name
-                
-                # 使用简历解析器提取文本内容
-                parsed_result = resume_parser.parse_resume(temp_file_path)
-                
-                if parsed_result.get('success', False):
-                    resume_context = parsed_result.get('raw_text', '')
-                    logger.info(f"✅ 简历解析成功: {len(resume_context)} 字符")
-                    
-                    # 保存简历文件到永久位置
-                    upload_dir = "uploads/resumes"
-                    os.makedirs(upload_dir, exist_ok=True)
-                    permanent_filename = f"{uuid.uuid4()}_{resume.filename}"
-                    resume_path = os.path.join(upload_dir, permanent_filename)
-                    
-                    # 复制临时文件到永久位置
-                    import shutil
-                    shutil.copy2(temp_file_path, resume_path)
-                    logger.info(f"✅ 简历文件已保存: {resume_path}")
+                if resume.content_type == 'application/pdf':
+                    # 处理PDF文件
+                    import PyPDF2
+                    with open(file_path, 'rb') as pdf_file:
+                        pdf_reader = PyPDF2.PdfReader(pdf_file)
+                        resume_content = ""
+                        for page in pdf_reader.pages:
+                            resume_content += page.extract_text()
+                elif resume.content_type == 'text/plain':
+                    # 处理文本文件
+                    with open(file_path, 'r', encoding='utf-8') as txt_file:
+                        resume_content = txt_file.read()
                 else:
-                    logger.error(f"❌ 简历解析失败: {parsed_result.get('error', '未知错误')}")
-                    resume_context = f"简历文件解析失败: {parsed_result.get('error', '未知错误')}"
-                
-                # 清理临时文件
-                try:
-                    os.unlink(temp_file_path)
-                except:
-                    pass
+                    # 对于Word文档，暂时使用文件路径
+                    resume_content = f"简历文件路径: {file_path}"
                     
+                logger.info(f"简历内容提取成功，长度: {len(resume_content) if resume_content else 0}")
+                
             except Exception as e:
-                logger.error(f"❌ 简历文件处理失败: {str(e)}")
-                resume_context = f"简历文件处理失败: {str(e)}"
+                logger.warning(f"简历内容提取失败: {str(e)}，将使用文件路径")
+                resume_content = f"简历文件路径: {file_path}"
         
         # 创建面试记录
         interview = Interview(
             position=interview_data.position,
             difficulty=interview_data.difficulty,
-            resume_context=resume_context,
-            resume_path=resume_path,
-            status="active"
+            status="pending",  # 初始状态为pending
+            resume_filename=resume_filename,
+            resume_content=resume_content,
+            created_at=datetime.now()
         )
         
         db.add(interview)
         db.commit()
         db.refresh(interview)
         
-        logger.info(f"✅ 面试会话创建成功: ID={interview.id}")
+        logger.info(f"面试记录创建成功: ID={interview.id}")
         
-        # 🔄 使用YAML配置的顺序流程管理器初始化面试
-        try:
-            manager = CrewAIYAMLSequentialManager(interview.id, db)
-            await manager.initialize_interview()
-            logger.info(f"✅ 顺序架构面试管理器初始化成功: ID={interview.id}")
-        except Exception as e:
-            logger.warning(f"⚠️ 顺序架构管理器初始化失败: {str(e)}，将继续使用基础功能")
+        # 根据execute_crewai参数决定是否立即执行CrewAI流程
+        if execute_crewai:
+            logger.info(f"立即执行CrewAI流程: 面试ID={interview.id}")
+            
+            # 🔄 使用AI集成服务（Flow架构优先）
+            crewai_integration = get_crewai_integration()
+            
+            if crewai_integration.is_available():
+                try:
+                    # 执行CrewAI面试流程
+                    result = await crewai_integration.conduct_interview(
+                        resume_context=resume_content or "",
+                        position=interview_data.position,
+                        difficulty=interview_data.difficulty,
+                        interview_id=str(interview.id)
+                    )
+                    
+                    if result.get('status') == 'success':
+                        interview.status = "active"
+                        db.commit()
+                        logger.info(f"CrewAI面试流程启动成功: 面试ID={interview.id}")
+                    else:
+                        logger.error(f"CrewAI面试流程启动失败: {result.get('error')}")
+                        
+                except Exception as e:
+                    logger.error(f"CrewAI执行失败: {str(e)}")
+            else:
+                logger.warning("CrewAI不可用，面试将使用传统模式")
+                interview.status = "active"
+                db.commit()
+        else:
+            logger.info(f"跳过CrewAI执行，面试ID={interview.id}保持pending状态")
         
+        # 返回面试响应
         return InterviewResponse(
             id=interview.id,
             position=interview.position,
             difficulty=interview.difficulty,
             status=interview.status,
-            created_at=interview.created_at,
-            messages=[]
+            resume_filename=interview.resume_filename,
+            resume_content=interview.resume_content,
+            created_at=interview.created_at
         )
         
     except Exception as e:
-        logger.error(f"❌ 创建面试会话失败: {str(e)}")
-        db.rollback()
+        logger.error(f"创建面试服务失败: {str(e)}")
+        if db:
+            db.rollback()
         raise
 
 
@@ -210,14 +251,18 @@ async def send_message_service(
         db.commit()
         db.refresh(user_message)
         
-        # 🔄 使用YAML配置的顺序流程管理器处理消息
-        try:
-            manager = CrewAIYAMLSequentialManager(interview_id, db)
-            response_content = await manager.process_user_message(message_data.content)
-            logger.info(f"✅ 顺序架构处理用户消息成功: {message_data.content[:50]}...")
-        except Exception as e:
-            logger.warning(f"⚠️ 顺序架构处理失败: {str(e)}，使用简化回复")
+        # 🔄 使用AI集成服务处理消息（Flow架构优先）
         response_content = f"收到您的消息：{message_data.content}\n\n我们的AI面试团队正在分析中，请稍候..."
+        try:
+            ai_integration = get_crewai_integration()
+            if ai_integration.is_available():
+                # TODO: 实现具体的消息处理逻辑
+                logger.info(f"✅ AI集成服务可用，架构模式: {ai_integration.architecture_mode}")
+                # response_content = await ai_integration.process_message(interview_id, message_data.content)
+            else:
+                logger.warning("⚠️ AI集成服务不可用，使用简化回复")
+        except Exception as e:
+            logger.warning(f"⚠️ AI集成服务处理失败: {str(e)}，使用简化回复")
         
         # 保存AI响应消息
         if response_content:

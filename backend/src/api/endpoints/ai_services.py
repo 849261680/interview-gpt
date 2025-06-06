@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 import logging
 
 from ...services.ai.ai_service_manager import ai_service_manager
-from ...services.ai.crewai_integration import crewai_integration
+from ...services.ai.crewai_integration import get_crewai_integration
 from ...db.database import get_db
 from ...utils.exceptions import AIServiceError
 
@@ -116,12 +116,13 @@ async def get_available_interviewers():
         logger.info("获取可用面试官类型")
         
         # 从CrewAI集成获取面试官信息
+        crewai_integration = get_crewai_integration()
         interviewer_types = crewai_integration.get_available_interviewers()
         
         # 获取面试官详细信息
         interviewers_info = {}
         for interviewer_type in interviewer_types:
-            if interviewer_type in crewai_integration.agents:
+            if hasattr(crewai_integration, 'agents') and interviewer_type in crewai_integration.agents:
                 agent = crewai_integration.agents[interviewer_type]
                 interviewers_info[interviewer_type] = {
                     "type": interviewer_type,
@@ -210,17 +211,29 @@ async def test_interview_round(
         
         # 提取请求参数
         interviewer_type = request_data.get("interviewer_type", "technical")
-        message = request_data.get("message", "我有3年的Python开发经验。")
         position = request_data.get("position", "AI应用工程师")
         difficulty = request_data.get("difficulty", "medium")
         
-        # 构建测试消息历史
-        messages = [
-            {"sender_type": "system", "content": "面试开始"},
-            {"sender_type": "user", "content": message}
-        ]
+        # 获取消息历史，支持多轮对话
+        messages = request_data.get("messages", [])
+        
+        # 如果没有提供messages，使用旧的message字段作为兼容
+        if not messages:
+            message = request_data.get("message", "我有3年的Python开发经验。")
+            messages = [
+                {"sender_type": "system", "content": "面试开始"},
+                {"sender_type": "user", "content": message}
+            ]
+        
+        # 获取最新的用户消息用于显示
+        latest_user_message = ""
+        for msg in reversed(messages):
+            if msg.get("sender_type") == "user":
+                latest_user_message = msg.get("content", "")
+                break
         
         # 调用CrewAI进行面试
+        crewai_integration = get_crewai_integration()
         response = await crewai_integration.conduct_interview_round(
             interviewer_type=interviewer_type,
             messages=messages,
@@ -234,7 +247,7 @@ async def test_interview_round(
                 "interviewer_type": interviewer_type,
                 "position": position,
                 "difficulty": difficulty,
-                "user_message": message,
+                "user_message": latest_user_message,
                 "interviewer_response": response
             }
         }

@@ -33,27 +33,100 @@ export default function NewInterview() {
     }
   };
 
+  // 处理拖拽上传
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      // 检查文件类型
+      const allowedTypes = ['.pdf', '.doc', '.docx'];
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+
+      if (allowedTypes.includes(fileExtension)) {
+        // 检查文件大小 (10MB = 10 * 1024 * 1024 bytes)
+        if (file.size <= 10 * 1024 * 1024) {
+          setResumeFile(file);
+        } else {
+          alert('文件大小不能超过 10MB');
+        }
+      } else {
+        alert('只支持 PDF、DOC、DOCX 格式的文件');
+      }
+    }
+  };
+
   // 处理表单提交
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 在没有完整后端的情况下，模拟面试创建
+      // 创建FormData对象用于文件上传
       const formData = new FormData();
       formData.append('position', position);
       formData.append('difficulty', difficulty);
-      if (resumeFile) formData.append('resume', resumeFile);
+      if (resumeFile) {
+        formData.append('resume', resumeFile);
+      }
       
-      // 模拟API调用延迟
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 调用后端API创建面试
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+      const response = await fetch(`${apiUrl}/interviews/`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: '创建面试失败' }));
+        throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('面试创建成功:', result);
       
-      // 模拟面试ID
-      const mockInterviewId = Math.floor(Math.random() * 10000).toString();
-      router.push(`/interview/${mockInterviewId}`);
+      // 获取真实的面试ID
+      const interviewId = result.id || result.data?.id;
+      if (!interviewId) {
+        throw new Error('服务器返回的面试ID无效');
+      }
+
+      // 跳转到面试页面
+      router.push(`/interview/${interviewId}`);
+      
     } catch (error) {
       console.error('创建面试失败:', error);
-      alert('创建面试失败，请重试');
+      
+      // 显示具体的错误信息
+      const errorMessage = error instanceof Error ? error.message : '创建面试失败，请重试';
+      alert(`创建面试失败: ${errorMessage}`);
+      
+      // 如果是网络错误，提供备用方案
+      if (error instanceof Error && (error.message.includes('fetch') || error.message.includes('network'))) {
+        const useBackup = confirm('无法连接到服务器，是否使用演示模式？');
+        if (useBackup) {
+          // 只有在用户明确选择时才使用模拟ID
+          const mockInterviewId = 1; // 使用数据库中存在的ID
+          router.push(`/interview/${mockInterviewId}`);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -341,13 +414,19 @@ export default function NewInterview() {
                 }}>
                   上传简历 (可选)
                 </label>
-                <div style={{
-                  border: '2px dashed rgba(255, 255, 255, 0.2)',
-                  borderRadius: '0.5rem',
-                  padding: '2rem',
-                  textAlign: 'center',
-                  transition: 'border-color 0.2s'
-                }}>
+                <div
+                  style={{
+                    border: '2px dashed rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0.5rem',
+                    padding: '2rem',
+                    textAlign: 'center',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onDragOver={handleDragOver}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
                   {resumeFile ? (
                     <div>
                       <p style={{ color: '#10b981', marginBottom: '0.5rem' }}>
@@ -396,18 +475,30 @@ export default function NewInterview() {
                         style={{ display: 'none' }}
                         onChange={handleResumeChange}
                       />
-                      <label htmlFor="resume-upload">
-                        <button type="button" style={{
+                      <label
+                        htmlFor="resume-upload"
+                        style={{
+                          display: 'inline-block',
                           background: 'transparent',
                           border: '1px solid rgba(59, 130, 246, 0.3)',
                           color: 'white',
                           padding: '0.5rem 1rem',
                           borderRadius: '0.375rem',
                           cursor: 'pointer',
-                          fontSize: '0.875rem'
-                        }}>
-                          选择文件
-                        </button>
+                          fontSize: '0.875rem',
+                          transition: 'all 0.2s',
+                          userSelect: 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.6)';
+                          e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        选择文件
                       </label>
                     </>
                   )}

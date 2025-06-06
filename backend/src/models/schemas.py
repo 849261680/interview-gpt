@@ -36,7 +36,8 @@ class Interview(Base):
     status = Column(String(20), default="active")  # active, completed, cancelled
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
-    resume_path = Column(String(255), nullable=True)  # 简历文件路径
+    resume_filename = Column(String(255), nullable=True)  # 简历文件名
+    resume_content = Column(Text, nullable=True)  # 简历文本内容
     overall_score = Column(Float, nullable=True)  # 总体评分
     
     # 关系

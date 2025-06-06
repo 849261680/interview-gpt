@@ -12,7 +12,6 @@ class InterviewCreate(BaseModel):
     """创建面试的请求模型"""
     position: str
     difficulty: str
-    resume_path: Optional[str] = None
 
 
 class InterviewResponse(BaseModel):
@@ -23,7 +22,8 @@ class InterviewResponse(BaseModel):
     status: str
     created_at: datetime
     completed_at: Optional[datetime] = None
-    resume_path: Optional[str] = None
+    resume_filename: Optional[str] = None
+    resume_content: Optional[str] = None
     overall_score: Optional[float] = None
 
     class Config:

@@ -10,7 +10,8 @@ import json
 
 from ...db.database import get_db
 from ...models.schemas import Interview, Message
-from ...agents.interviewer_factory import InterviewerFactory
+# 使用新的CrewAI架构，不再需要InterviewerFactory
+from ...services.ai.crewai_integration import get_crewai_integration
 
 # 设置日志
 logger = logging.getLogger(__name__)
@@ -75,66 +76,56 @@ async def get_interview_feedback(interview_id: int, db: Session = Depends(get_db
                     interview_content_by_interviewer[interviewer_id] = []
                 interview_content_by_interviewer[interviewer_id].append(msg)
         
-        # 获取各面试官的评估反馈
-        interviewer_factory = InterviewerFactory()
+        # 使用CrewAI集成获取评估反馈
+        crewai_integration = get_crewai_integration()
         feedback_data = {}
         
-        # 技术面试官反馈
-        if "technical" in interview_content_by_interviewer:
-            technical_interviewer = interviewer_factory.get_interviewer("technical")
-            technical_content = "\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                          else f"候选人: {msg['content']}" 
-                                          for msg in messages_data if msg.get('interviewer_id') == 'technical' 
-                                          or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'technical')])
-            feedback_data["technical"] = await technical_interviewer.generate_feedback(technical_content)
+        if not crewai_integration.is_available():
+            logger.warning("CrewAI不可用，返回基础反馈")
+            return {
+                "interview_id": interview_id,
+                "position": interview.position,
+                "interview_date": interview.created_at.isoformat(),
+                "feedback_by_interviewer": {"message": "CrewAI服务不可用，无法生成详细反馈"},
+                "final_assessment": {"message": "CrewAI服务不可用，无法生成最终评估"}
+            }
         
-        # HR面试官反馈
-        if "hr" in interview_content_by_interviewer:
-            hr_interviewer = interviewer_factory.get_interviewer("hr")
-            hr_content = "\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                   else f"候选人: {msg['content']}" 
-                                   for msg in messages_data if msg.get('interviewer_id') == 'hr' 
-                                   or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'hr')])
-            feedback_data["hr"] = await hr_interviewer.generate_feedback(hr_content)
-        
-        # 产品经理面试官反馈
-        if "product_manager" in interview_content_by_interviewer:
-            product_interviewer = interviewer_factory.get_interviewer("product_manager")
-            product_content = "\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                        else f"候选人: {msg['content']}" 
-                                        for msg in messages_data if msg.get('interviewer_id') == 'product_manager' 
-                                        or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'product_manager')])
-            feedback_data["product_manager"] = await product_interviewer.generate_feedback(product_content)
-        
-        # 行为面试官反馈
-        if "behavioral" in interview_content_by_interviewer:
-            behavioral_interviewer = interviewer_factory.get_interviewer("behavioral")
-            behavioral_content = "\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                           else f"候选人: {msg['content']}" 
-                                           for msg in messages_data if msg.get('interviewer_id') == 'behavioral' 
-                                           or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'behavioral')])
-            feedback_data["behavioral"] = await behavioral_interviewer.generate_feedback(behavioral_content)
-        
-        # 总面试官生成最终评估报告
-        senior_interviewer = interviewer_factory.get_interviewer("senior")
-        final_assessment = await senior_interviewer.generate_final_assessment(
-            technical_content="\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                       else f"候选人: {msg['content']}" 
-                                       for msg in messages_data if msg.get('interviewer_id') == 'technical' 
-                                       or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'technical')]),
-            hr_content="\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                else f"候选人: {msg['content']}" 
-                                for msg in messages_data if msg.get('interviewer_id') == 'hr' 
-                                or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'hr')]),
-            product_content="\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                     else f"候选人: {msg['content']}" 
-                                     for msg in messages_data if msg.get('interviewer_id') == 'product_manager' 
-                                     or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'product_manager')]),
-            behavioral_content="\n".join([f"面试官: {msg['content']}" if msg['sender_type'] == 'interviewer' 
-                                        else f"候选人: {msg['content']}" 
-                                        for msg in messages_data if msg.get('interviewer_id') == 'behavioral' 
-                                        or (msg.get('sender_type') == 'user' and messages_data[messages_data.index(msg)-1].get('interviewer_id') == 'behavioral')])
-        )
+        # 使用CrewAI进行完整的面试评估
+        try:
+            # 转换消息格式为CrewAI需要的格式
+            message_history = []
+            for msg in messages_data:
+                message_history.append({
+                    "sender": msg.get("sender_type", "user"),
+                    "content": msg["content"],
+                    "interviewer_id": msg.get("interviewer_id"),
+                    "timestamp": msg["timestamp"]
+                })
+            
+            # 使用CrewAI进行完整面试流程评估
+            evaluation_result = await crewai_integration.conduct_interview(
+                resume_context=interview.resume_content or "",
+                position=interview.position,
+                difficulty=interview.difficulty
+            )
+            
+            # 解析评估结果
+            if isinstance(evaluation_result, str):
+                final_assessment = evaluation_result
+                feedback_data = {
+                    "technical": "基于CrewAI评估生成",
+                    "hr": "基于CrewAI评估生成", 
+                    "behavioral": "基于CrewAI评估生成",
+                    "overall": evaluation_result
+                }
+            else:
+                final_assessment = evaluation_result.get("final_assessment", "评估完成")
+                feedback_data = evaluation_result.get("feedback_by_interviewer", {})
+                
+        except Exception as e:
+            logger.error(f"CrewAI评估失败: {str(e)}")
+            final_assessment = f"评估生成失败: {str(e)}"
+            feedback_data = {"error": f"评估生成失败: {str(e)}"}
         
         # 整合反馈数据
         result = {

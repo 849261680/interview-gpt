@@ -11,7 +11,7 @@ import traceback
 from ...config.settings import settings
 from ...db.database import get_db
 from ...services.ai.ai_service_manager import ai_service_manager
-from ...services.ai.crewai_integration import crewai_integration
+from ...services.ai.crewai_integration import get_crewai_integration
 from ...utils.exceptions import AIServiceError
 
 # 设置日志
@@ -67,6 +67,7 @@ async def chat(request_data: Dict[str, Any]):
         logger.debug(f"面试消息历史: {crewai_messages}")
         
         # 调用CrewAI进行面试
+        crewai_integration = get_crewai_integration()
         response = await crewai_integration.conduct_interview_round(
             interviewer_type=interviewer_type,
             messages=crewai_messages,

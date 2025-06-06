@@ -10,8 +10,8 @@ import statistics
 from sqlalchemy.orm import Session
 
 from ..models.schemas import Interview, Message, Feedback, InterviewerFeedback
-from ..agents.interviewer_factory import InterviewerFactory
-from ..services.ai.crewai_integration import crewai_integration
+# 使用新的CrewAI架构，不再需要InterviewerFactory
+from .ai.crewai_integration import get_crewai_integration
 from ..utils.exceptions import ValidationError, AIServiceError
 
 # 设置日志
@@ -208,12 +208,15 @@ class AssessmentService:
         assessments = {}
         
         # 获取面试官序列
-        interviewer_sequence = InterviewerFactory.get_interviewer_sequence()
+        # 使用CrewAI获取面试官序列
+        crewai_integration = get_crewai_integration()
+        interviewer_sequence = crewai_integration.get_available_interviewers()
         
         for interviewer_id in interviewer_sequence:
             try:
                 # 获取面试官实例
-                interviewer = InterviewerFactory.get_interviewer(interviewer_id)
+                # 使用CrewAI进行面试轮次评估
+            # interviewer = InterviewerFactory.get_interviewer(interviewer_id)  # 已删除
                 
                 # 生成评估
                 feedback = await interviewer.generate_feedback(messages)

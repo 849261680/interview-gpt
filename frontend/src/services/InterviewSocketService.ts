@@ -53,12 +53,9 @@ class InterviewSocketService extends EventEmitter {
     this.isConnecting = true;
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const wsUrl = baseUrl.replace(/^http/, 'ws');
-      
-      // 处理baseUrl中可能已经包含的/api路径
-      const apiPath = wsUrl.endsWith('/api') ? '' : '/api';
-      const wsEndpoint = `${wsUrl}${apiPath}/interview-process/${interviewId}/ws`;
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace(/\/$/, '');
+      const wsUrl = apiUrl.replace(/^http/, 'ws');
+      const wsEndpoint = `${wsUrl}/interview-process/${interviewId}/ws`;
       
       console.log(`[DEBUG] 尝试连接WebSocket: ${wsEndpoint}`);
       this.socket = new WebSocket(wsEndpoint);
@@ -191,7 +188,18 @@ class InterviewSocketService extends EventEmitter {
         break;
         
       case 'error':
-        this.emit('socket_error', messageData);
+        console.error(`[DEBUG] 收到WebSocket错误:`, messageData);
+        
+        // 特殊处理面试ID不存在的错误
+        if (messageData.code === 'INTERVIEW_NOT_FOUND') {
+          this.emit('interview_not_found', {
+            message: messageData.message,
+            existing_interviews: messageData.existing_interviews,
+            suggested_action: messageData.suggested_action
+          });
+        } else {
+          this.emit('socket_error', messageData);
+        }
         break;
         
       default:

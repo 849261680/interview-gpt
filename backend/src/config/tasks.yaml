@@ -1,0 +1,142 @@
+# CrewAI 面试任务配置文件
+# 定义所有面试任务的描述和预期输出
+
+resume_analysis_task:
+  description: |
+    分析候选人简历内容，提取关键信息并评估与目标职位的匹配度。
+    
+    任务要求：
+    1. 分析简历内容：{resume_context}
+    2. 通过语义搜索分析教育背景、工作经历、项目经验、技能水平
+    3. 评估与目标职位 {position} 的匹配程度
+    4. 识别简历中的亮点和潜在问题
+    5. 为后续面试环节提供针对性建议
+    
+    面试难度：{difficulty}
+    
+    请基于简历内容进行深入分析，提出3-5个深入的问题，帮助了解候选人的真实能力和经验。
+  expected_output: |
+    简历分析报告，包含：
+    - 候选人基本信息总结（姓名、联系方式、教育背景）
+    - 工作经历详细分析（公司、职位、时间、主要成就）
+    - 技能匹配度评估（与目标职位的匹配程度）
+    - 项目经验亮点（重要项目和技术栈）
+    - 针对性面试问题（3-5个基于简历内容的深入问题）
+    - 为后续面试的建议和关注点
+  agent: resume_analyzer
+
+hr_interview_task:
+  description: |
+    进行HR面试，评估候选人的职业素养、文化匹配度和职业发展规划。
+    
+    任务要求：
+    1. 基于简历分析结果进行深入交流
+    2. 了解候选人的职业规划和发展目标
+    3. 评估候选人与公司文化的匹配度
+    4. 了解候选人的工作动机和价值观
+    5. 评估候选人的沟通能力和团队协作精神
+    
+    目标职位：{position}
+    面试难度：{difficulty}
+    
+    请通过专业的HR面试技巧，全面了解候选人的软技能和文化适应性。
+  expected_output: |
+    HR面试评估报告，包含：
+    - 职业素养评分（1-10分）
+    - 文化匹配度评估
+    - 沟通能力评价
+    - 职业规划分析
+    - 团队协作能力评估
+    - HR面试建议和关注点
+  agent: hr_interviewer
+  context:
+    - resume_analysis_task
+
+technical_interview_task:
+  description: |
+    进行技术面试，全面评估候选人的技术能力、问题解决能力和技术深度。
+    
+    任务要求：
+    1. 基于前面的面试结果，针对性提出技术问题
+    2. 评估候选人的技术知识深度和广度
+    3. 测试候选人的问题解决思路和方法
+    4. 了解候选人的技术经验和项目实践
+    5. 评估候选人的学习能力和技术发展潜力
+    
+    目标职位：{position}
+    面试难度：{difficulty}
+    
+    请设计合适难度的技术问题，全面评估候选人的技术水平。
+  expected_output: |
+    技术面试评估报告，包含：
+    - 技术知识评分（1-10分）
+    - 问题解决能力评估
+    - 代码质量和工程实践评价
+    - 技术深度分析
+    - 学习能力评估
+    - 技术发展潜力预测
+  agent: technical_interviewer
+  context:
+    - resume_analysis_task
+    - hr_interview_task
+
+behavioral_interview_task:
+  description: |
+    进行行为面试，评估候选人的行为模式、团队协作能力和处理挑战的方式。
+    
+    任务要求：
+    1. 使用STAR方法深入了解候选人的过往行为
+    2. 评估候选人在团队合作中的表现
+    3. 了解候选人处理压力和冲突的方式
+    4. 评估候选人的领导力和影响力
+    5. 分析候选人的行为模式和适应能力
+    
+    目标职位：{position}
+    面试难度：{difficulty}
+    
+    请通过具体的行为案例，深入了解候选人的综合素质。
+  expected_output: |
+    行为面试评估报告，包含：
+    - 团队协作能力评分（1-10分）
+    - 压力处理能力评估
+    - 沟通和人际能力评价
+    - 领导力潜力分析
+    - 行为模式总结
+    - 适应能力预测
+  agent: behavioral_interviewer
+  context:
+    - resume_analysis_task
+    - hr_interview_task
+    - technical_interview_task
+
+final_evaluation_task:
+  description: |
+    综合分析所有面试环节的表现，生成最终的评估报告和录用建议。
+    
+    任务要求：
+    1. 收集并分析简历分析、HR面试、技术面试、行为面试的结果
+    2. 综合评估候选人的各项能力指标
+    3. 计算综合评分和各维度得分
+    4. 识别候选人的核心优势和发展空间
+    5. 提供明确的录用建议和理由
+    
+    目标职位：{position}
+    面试难度：{difficulty}
+    
+    请基于所有面试数据，生成客观、全面的最终评估报告。
+  expected_output: |
+    最终面试评估报告，包含：
+    - 综合评分（1-10分）
+    - 各维度详细评分
+    - 候选人优势总结
+    - 需要改进的方面
+    - 录用建议（强烈推荐/推荐/待定/不推荐）
+    - 职位匹配度分析
+    - 发展潜力预测
+    - 具体的改进建议
+  agent: interview_evaluator
+  context:
+    - resume_analysis_task
+    - hr_interview_task
+    - technical_interview_task
+    - behavioral_interview_task 

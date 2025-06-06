@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from ...models.schemas import Interview, Message
 from ...services.interview_service import get_interview_service, send_message_service
 from ...services.interview.interview_manager import InterviewManager, get_or_create_interview_manager
+from ...services.ai.crewai_integration import get_crewai_integration
 
 logger = logging.getLogger(__name__)
 
@@ -313,10 +314,10 @@ class ConnectionManager:
             current_interviewer_id = INTERVIEW_STAGES[current_stage]['interviewer_id']
             
             # 根据面试官 ID 获取面试官名称
-            from ...agents.interviewer_factory import InterviewerFactory # Keep local import if not used elsewhere frequently
-            interviewer_factory = InterviewerFactory()
-            interviewer = interviewer_factory.get_interviewer(current_interviewer_id)
-            interviewer_name = interviewer.name if interviewer else "未知面试官"
+            # 使用新的CrewAI架构，不再需要InterviewerFactory
+            crewai_integration = get_crewai_integration()
+            available_interviewers = crewai_integration.get_available_interviewers()
+            interviewer_name = current_interviewer_id if current_interviewer_id in available_interviewers else "未知面试官"
             
             # 通知前端当前面试官变更
             return {

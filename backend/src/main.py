@@ -10,14 +10,24 @@ import logging
 from typing import Dict
 
 # 导入配置
-from src.config.settings import settings
+try:
+    from src.config.settings import settings
+except ImportError:
+    from backend.src.config.settings import settings
 
 # 导入错误处理
-from src.middlewares.error_handler import (
-    ErrorHandlerMiddleware,
-    create_http_exception_handler,
-    create_validation_exception_handler
-)
+try:
+    from src.middlewares.error_handler import (
+        ErrorHandlerMiddleware,
+        create_http_exception_handler,
+        create_validation_exception_handler
+    )
+except ImportError:
+    from backend.src.middlewares.error_handler import (
+        ErrorHandlerMiddleware,
+        create_http_exception_handler,
+        create_validation_exception_handler
+    )
 
 # 创建应用实例
 app = FastAPI(
@@ -41,7 +51,10 @@ app.add_middleware(
 app.add_middleware(ErrorHandlerMiddleware)
 
 # 重新启用请求日志中间件，以便在控制台看到API请求
-from src.middlewares.request_logger import RequestLoggingMiddleware
+try:
+    from src.middlewares.request_logger import RequestLoggingMiddleware
+except ImportError:
+    from backend.src.middlewares.request_logger import RequestLoggingMiddleware
 app.add_middleware(RequestLoggingMiddleware)
 
 # 配置异常处理器
@@ -108,10 +121,42 @@ async def health_check() -> Dict[str, str]:
         "timestamp": "2024-01-01T00:00:00Z"
     }
 
+# 添加显式的OPTIONS处理器来解决CORS预检请求问题
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """
+    处理所有OPTIONS预检请求
+    这是为了确保CORS预检请求能够正确处理
+    """
+    return {"message": "OK"}
+
 # 导入路由
-from src.api.router import api_router
+try:
+    from src.api.router import api_router
+except ImportError:
+    try:
+        from backend.src.api.router import api_router
+    except ImportError:
+        try:
+            from .api.router import api_router
+        except ImportError:
+            # 最后尝试相对导入
+            import sys
+            import os
+            sys.path.append(os.path.dirname(__file__))
+            from api.router import api_router
 app.include_router(api_router, prefix="/api")
 
 # 直接运行（开发环境）
 if __name__ == "__main__":
-    uvicorn.run("src.main:app", host="0.0.0.0", port=9999, reload=True)
+    # 根据运行环境确定应用路径
+    import sys
+    import os
+    
+    # 检查是否从项目根目录运行
+    if 'backend' in sys.modules or os.path.exists('backend'):
+        app_path = "backend.src.main:app"
+    else:
+        app_path = "src.main:app"
+    
+    uvicorn.run(app_path, host="0.0.0.0", port=9999, reload=True)

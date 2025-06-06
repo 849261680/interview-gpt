@@ -18,9 +18,9 @@ def init_db():
     在应用启动时调用
     """
     try:
-        # 动态导入模型，避免循环导入
-        interview_module = importlib.import_module("..models.interview", package="src.db")
-        Base = interview_module.Base
+        # 动态导入模型，使用schemas.py中的完整模型定义
+        schemas_module = importlib.import_module("..models.schemas", package="src.db")
+        Base = schemas_module.Base
         
         # 创建所有表
         Base.metadata.create_all(bind=engine)
@@ -46,9 +46,9 @@ def _init_data(db: Session):
     如果需要在应用启动时创建一些基础数据，可以在这里添加
     """
     try:
-        # 动态导入User模型
-        interview_module = importlib.import_module("..models.interview", package="src.db")
-        User = interview_module.User
+        # 动态导入User模型，使用schemas.py中的模型
+        schemas_module = importlib.import_module("..models.schemas", package="src.db")
+        User = schemas_module.User
         
         # 检查是否需要创建默认用户
         user_count = db.query(User).count()

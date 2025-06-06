@@ -35,12 +35,12 @@ export default function InterviewSession() {
   const interviewId = id ? parseInt(id as string) : 0;
   
   // 面试官类型定义
-  type InterviewerType = 'coordinator' | 'technical' | 'hr' | 'product' | 'product_manager' | 'behavioral' | 'final';
+  type InterviewerType = 'resume_analyzer' | 'hr' | 'technical' | 'behavioral' | 'interview_evaluator' | 'coordinator' | 'product' | 'product_manager' | 'final';
 
   // 基础状态管理
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
-  const [currentInterviewer, setCurrentInterviewer] = useState<InterviewerType>('coordinator');
+  const [currentInterviewer, setCurrentInterviewer] = useState<InterviewerType>('resume_analyzer');
   const [isLoading, setIsLoading] = useState(false);
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [interviewEnded, setInterviewEnded] = useState(false);
@@ -84,14 +84,23 @@ export default function InterviewSession() {
     color: string;
     voice: string;
   }> = {
-    coordinator: {
-      id: 'coordinator',
-      name: '赵老师',
-      role: '面试协调员',
-      avatar: '🧑‍💼',
-      description: '专业面试协调员，负责协调整个面试流程',
-      color: '#14b8a6',
+    resume_analyzer: {
+      id: 'resume_analyzer',
+      name: '张老师',
+      role: '简历分析师',
+      avatar: '📋',
+      description: '专业简历分析师，负责深入分析候选人简历，挖掘关键信息',
+      color: '#6366f1',
       voice: 'female-tianmei'
+    },
+    hr: {
+      id: 'hr',
+      name: '王经理',
+      role: 'HR面试官',
+      avatar: '👩‍💼',
+      description: '人力资源总监，关注职业规划和公司文化匹配度',
+      color: '#10b981',
+      voice: 'female-shaonv'
     },
     technical: {
       id: 'technical',
@@ -102,14 +111,32 @@ export default function InterviewSession() {
       color: '#3b82f6',
       voice: 'male-qn-qingse'
     },
-    hr: {
-      id: 'hr',
-      name: '王经理',
-      role: 'HR面试官',
-      avatar: '👩‍💼',
-      description: '人力资源总监，关注职业规划和公司文化匹配度',
-      color: '#10b981',
-      voice: 'female-shaonv'
+    behavioral: {
+      id: 'behavioral',
+      name: '刘老师',
+      role: '行为面试官',
+      avatar: '👨‍🏫',
+      description: '专业行为面试官，评估候选人的软技能和行为模式',
+      color: '#9333ea',
+      voice: 'female-yujie'
+    },
+    interview_evaluator: {
+      id: 'interview_evaluator',
+      name: '李总监',
+      role: '面试评估官',
+      avatar: '📊',
+      description: '资深面试评估专家，负责综合分析各环节表现，生成客观评估报告',
+      color: '#f59e0b',
+      voice: 'male-qn-jingying'
+    },
+    coordinator: {
+      id: 'coordinator',
+      name: '赵老师',
+      role: '面试协调员',
+      avatar: '🧑‍💼',
+      description: '专业面试协调员，负责协调整个面试流程',
+      color: '#14b8a6',
+      voice: 'female-tianmei'
     },
     product: {
       id: 'product',
@@ -128,15 +155,6 @@ export default function InterviewSession() {
       description: '资深产品总监，关注产品思维和用户视角',
       color: '#fb923c',
       voice: 'male-chunhou'
-    },
-    behavioral: {
-      id: 'behavioral',
-      name: '刘老师',
-      role: '行为面试官',
-      avatar: '👨‍🏫',
-      description: '专业行为面试官，评估候选人的软技能和行为模式',
-      color: '#9333ea',
-      voice: 'female-yujie'
     },
     final: {
       id: 'final',
@@ -297,6 +315,39 @@ export default function InterviewSession() {
         console.error('WebSocket错误:', error);
         setWsError(error.message || '连接错误');
         setWsConnected(false);
+      });
+      
+      service.on('interview_not_found', (errorData: any) => {
+        console.error('面试ID不存在:', errorData);
+        setWsError(`面试不存在: ${errorData.message}`);
+        setWsConnected(false);
+        
+        // 显示错误消息给用户
+        setMessages(prev => [...prev, {
+          id: Date.now(),
+          content: `❌ ${errorData.message}\n\n${errorData.suggested_action}\n\n现有面试ID: ${errorData.existing_interviews.join(', ')}`,
+          sender: 'system',
+          timestamp: new Date().toISOString(),
+          isError: true
+        }]);
+        
+        // 提供跳转选项
+        if (errorData.existing_interviews && errorData.existing_interviews.length > 0) {
+          const useExisting = confirm(`面试ID ${interviewId} 不存在。是否跳转到现有面试 (ID: ${errorData.existing_interviews[0]})?`);
+          if (useExisting) {
+            router.push(`/interview/${errorData.existing_interviews[0]}`);
+          } else {
+            const createNew = confirm('是否创建新的面试?');
+            if (createNew) {
+              router.push('/interview/new');
+            }
+          }
+        } else {
+          const createNew = confirm('没有现有面试。是否创建新的面试?');
+          if (createNew) {
+            router.push('/interview/new');
+          }
+        }
       });
       
       service.on('close', () => {
@@ -1056,7 +1107,7 @@ export default function InterviewSession() {
 
   // 切换面试官
   const switchInterviewer = () => {
-    const stages: InterviewerType[] = ['coordinator', 'technical', 'product_manager', 'behavioral', 'hr', 'final'];
+    const stages: InterviewerType[] = ['resume_analyzer', 'hr', 'technical', 'behavioral', 'interview_evaluator'];
     const currentIndex = stages.indexOf(currentInterviewer);
     const nextIndex = (currentIndex + 1) % stages.length;
     const nextStage = stages[nextIndex];
@@ -1322,32 +1373,35 @@ export default function InterviewSession() {
           }}>
             <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem' }}>面试进度</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {Object.entries(interviewers)
-                // 过滤掉product角色，仅保留product_manager作为产品经理
-                .filter(([key]) => key !== 'product')
-                .map(([key, interviewer]) => (
-                <div key={key} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.5rem',
-                  borderRadius: '0.375rem',
-                  background: currentInterviewer === key ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: currentInterviewer === key ? interviewer.color : 'rgba(255, 255, 255, 0.3)'
-                  }}></div>
-                  <span style={{
-                    fontSize: '0.875rem',
-                    color: currentInterviewer === key ? 'white' : 'rgba(255, 255, 255, 0.7)'
+              {/* 按照新的五阶段面试顺序显示 */}
+              {['resume_analyzer', 'hr', 'technical', 'behavioral', 'interview_evaluator'].map((key) => {
+                const interviewer = interviewers[key as keyof typeof interviewers];
+                if (!interviewer) return null;
+                
+                return (
+                  <div key={key} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem',
+                    borderRadius: '0.375rem',
+                    background: currentInterviewer === key ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
                   }}>
-                    {interviewer.role}
-                  </span>
-                </div>
-              ))}
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      background: currentInterviewer === key ? interviewer.color : 'rgba(255, 255, 255, 0.3)'
+                    }}></div>
+                    <span style={{
+                      fontSize: '0.875rem',
+                      color: currentInterviewer === key ? 'white' : 'rgba(255, 255, 255, 0.7)'
+                    }}>
+                      {interviewer.role}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

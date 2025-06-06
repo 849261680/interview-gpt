@@ -11,7 +11,8 @@ import json
 from ...db.database import get_db
 from ...models.schemas import Interview, Message
 from ...models.pydantic_models import MessageCreate, MessageResponse
-from ...agents.interviewer_factory import InterviewerFactory
+# 使用新的CrewAI架构，不再需要InterviewerFactory
+from ...services.ai.crewai_integration import get_crewai_integration
 from ...services.interview_service import send_message_service, get_interview_messages_service
 # 替换音频服务导入
 from ...services.speech.speech_service import SpeechService
@@ -27,8 +28,8 @@ logger = logging.getLogger(__name__)
 # 创建语音服务实例
 speech_service = SpeechService()
 
-# 创建面试官工厂
-interviewer_factory = InterviewerFactory()
+# 使用CrewAI集成替代面试官工厂
+# interviewer_factory = InterviewerFactory()  # 已删除
 
 # 创建路由
 router = APIRouter()
@@ -342,12 +343,37 @@ async def websocket_endpoint(websocket: WebSocket, interview_id: int, db: Sessio
     """
     await websocket.accept()
     
-    # 添加到活跃连接
-    if interview_id not in active_connections:
-        active_connections[interview_id] = []
-    active_connections[interview_id].append(websocket)
-    
     try:
+        # 首先验证面试是否存在
+        interview = db.query(Interview).filter(Interview.id == interview_id).first()
+        if not interview:
+            # 获取所有现有面试ID用于调试
+            all_interviews = db.query(Interview.id, Interview.position).all()
+            existing_ids = [i.id for i in all_interviews]
+            
+            error_message = f"面试ID {interview_id} 不存在。现有面试ID: {existing_ids}"
+            logger.error(f"WebSocket连接失败: {error_message}")
+            
+            # 发送错误信息给前端
+            await websocket.send_json({
+                "type": "error",
+                "data": {
+                    "message": error_message,
+                    "code": "INTERVIEW_NOT_FOUND",
+                    "existing_interviews": existing_ids,
+                    "suggested_action": "请创建新的面试或使用现有的面试ID"
+                }
+            })
+            
+            # 关闭连接
+            await websocket.close(code=4004, reason="Interview not found")
+            return
+        
+        # 添加到活跃连接
+        if interview_id not in active_connections:
+            active_connections[interview_id] = []
+        active_connections[interview_id].append(websocket)
+        
         # 获取面试管理器
         interview_manager = await get_or_create_interview_manager(interview_id, db)
         
